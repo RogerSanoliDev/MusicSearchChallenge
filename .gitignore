@@ -1,0 +1,64 @@
+# =========================
+# Xcode
+# =========================
+build/
+DerivedData/
+*.xcworkspace
+!default.xcworkspace
+*.xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+
+# Xcode Cloud / Archives
+*.xcarchive
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# =========================
+# Swift Package Manager
+# =========================
+.build/
+Packages/
+Package.resolved
+
+
+# =========================
+# Code Coverage / Tests
+# =========================
+*.profdata
+*.gcda
+*.gcno
+*.gcov
+
+# =========================
+# Logs & Temp
+# =========================
+*.log
+*.tmp
+*.swp
+*.lock
+
+# =========================
+# macOS
+# =========================
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# =========================
+# Environment / Secrets
+# =========================
+.env
+.env.*
+*.key
+*.p12
+*.mobileprovision
+
+
+# =========================
+# Misc
+# =========================
+*.orig
+*.rej
