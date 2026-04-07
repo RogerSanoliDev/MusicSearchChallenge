@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		DB1559152F8581B30042D6CA /* Network in Frameworks */ = {isa = PBXBuildFile; productRef = DB1559142F8581B30042D6CA /* Network */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		DB0A5C802F8464AD008EF48A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DB1559152F8581B30042D6CA /* Network in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +83,7 @@
 				DB0A5C722F8464AB008EF48A /* MusicSearchChallenge */,
 				DB0A5C822F8464AD008EF48A /* MusicSearchChallengeTests */,
 				DB0A5C8C2F8464AD008EF48A /* MusicSearchChallengeUITests */,
+				DB1559132F8581B30042D6CA /* Frameworks */,
 				DB0A5C712F8464AB008EF48A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +96,13 @@
 				DB0A5C892F8464AD008EF48A /* MusicSearchChallengeUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		DB1559132F8581B30042D6CA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -112,6 +125,7 @@
 			);
 			name = MusicSearchChallenge;
 			packageProductDependencies = (
+				DB1559142F8581B30042D6CA /* Network */,
 			);
 			productName = MusicSearchChallenge;
 			productReference = DB0A5C702F8464AB008EF48A /* MusicSearchChallenge.app */;
@@ -195,6 +209,9 @@
 			);
 			mainGroup = DB0A5C672F8464AB008EF48A;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				DB8E7E952F85787A001E3A78 /* XCLocalSwiftPackageReference "Packages/Network" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DB0A5C712F8464AB008EF48A /* Products */;
 			projectDirPath = "";
@@ -576,6 +593,21 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		DB8E7E952F85787A001E3A78 /* XCLocalSwiftPackageReference "Packages/Network" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/Network;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DB1559142F8581B30042D6CA /* Network */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DB8E7E952F85787A001E3A78 /* XCLocalSwiftPackageReference "Packages/Network" */;
+			productName = Network;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = DB0A5C682F8464AB008EF48A /* Project object */;
 }
