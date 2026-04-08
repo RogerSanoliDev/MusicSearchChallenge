@@ -8,7 +8,7 @@
 import Testing
 @testable import MusicSearchChallenge
 import Foundation
-@testable import Network
+@testable import Networking
 
 struct APISearchRepositoryTests {
     @Test

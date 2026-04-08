@@ -6,7 +6,7 @@
 //
 
 import Foundation
-@testable import Network
+@testable import Networking
 
 actor APIClientMock: APIClientProtocol {
     var performRequestCount = 0

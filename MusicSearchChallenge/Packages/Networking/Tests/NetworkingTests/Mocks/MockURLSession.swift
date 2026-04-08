@@ -5,7 +5,7 @@
 //  Created by Roger dos Santos Oliveira on 07/04/26.
 //
 
-import Network
+import Networking
 import Foundation
 
 struct MockURLSession: URLSessionProtocol {

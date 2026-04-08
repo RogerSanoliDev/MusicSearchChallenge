@@ -6,7 +6,7 @@
 //
 
 import Testing
-@testable import Network
+@testable import Networking
 
 struct EndpointTests {
     

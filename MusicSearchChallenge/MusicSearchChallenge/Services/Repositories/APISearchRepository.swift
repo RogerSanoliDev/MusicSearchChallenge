@@ -5,7 +5,7 @@
 //  Created by Roger dos Santos Oliveira on 08/04/26.
 //
 
-import Network
+import Networking
 
 protocol APISearchRepositoryProtocol: Sendable {
     nonisolated func search(term: String, limit: Int, offset: Int) async throws -> SearchResponseDTO
