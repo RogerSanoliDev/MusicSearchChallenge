@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DB1559152F8581B30042D6CA /* Network in Frameworks */ = {isa = PBXBuildFile; productRef = DB1559142F8581B30042D6CA /* Network */; };
+		DB1559152F8581B30042D6CA /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = DB1559142F8581B30042D6CA /* Networking */; };
+		DB155AAE2F870E120042D6CA /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = DB155AAD2F870E120042D6CA /* SnapshotTesting */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,7 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB1559152F8581B30042D6CA /* Network in Frameworks */,
+				DB1559152F8581B30042D6CA /* Networking in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -64,6 +65,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DB155AAE2F870E120042D6CA /* SnapshotTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,7 +127,7 @@
 			);
 			name = MusicSearchChallenge;
 			packageProductDependencies = (
-				DB1559142F8581B30042D6CA /* Network */,
+				DB1559142F8581B30042D6CA /* Networking */,
 			);
 			productName = MusicSearchChallenge;
 			productReference = DB0A5C702F8464AB008EF48A /* MusicSearchChallenge.app */;
@@ -149,6 +151,7 @@
 			);
 			name = MusicSearchChallengeTests;
 			packageProductDependencies = (
+				DB155AAD2F870E120042D6CA /* SnapshotTesting */,
 			);
 			productName = MusicSearchChallengeTests;
 			productReference = DB0A5C7F2F8464AD008EF48A /* MusicSearchChallengeTests.xctest */;
@@ -210,7 +213,8 @@
 			mainGroup = DB0A5C672F8464AB008EF48A;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				DB8E7E952F85787A001E3A78 /* XCLocalSwiftPackageReference "Packages/Network" */,
+				DB8E7E952F85787A001E3A78 /* XCLocalSwiftPackageReference "Packages/Networking" */,
+				DB155AAC2F870E120042D6CA /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DB0A5C712F8464AB008EF48A /* Products */;
@@ -595,17 +599,33 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		DB8E7E952F85787A001E3A78 /* XCLocalSwiftPackageReference "Packages/Network" */ = {
+		DB8E7E952F85787A001E3A78 /* XCLocalSwiftPackageReference "Packages/Networking" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = Packages/Network;
+			relativePath = Packages/Networking;
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		DB155AAC2F870E120042D6CA /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-snapshot-testing";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.19.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
-		DB1559142F8581B30042D6CA /* Network */ = {
+		DB1559142F8581B30042D6CA /* Networking */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = DB8E7E952F85787A001E3A78 /* XCLocalSwiftPackageReference "Packages/Network" */;
-			productName = Network;
+			package = DB8E7E952F85787A001E3A78 /* XCLocalSwiftPackageReference "Packages/Networking" */;
+			productName = Networking;
+		};
+		DB155AAD2F870E120042D6CA /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DB155AAC2F870E120042D6CA /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

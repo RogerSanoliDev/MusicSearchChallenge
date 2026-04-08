@@ -8,7 +8,7 @@
 import Testing
 import Foundation
 
-@testable import Network
+@testable import Networking
 
 struct APIClientTests {
     private let sut = APIClient.shared

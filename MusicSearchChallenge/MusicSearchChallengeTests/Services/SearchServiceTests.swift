@@ -7,7 +7,7 @@
 
 import Testing
 @testable import MusicSearchChallenge
-import Network
+import Networking
 
 struct SearchServiceTests {
     @Test
