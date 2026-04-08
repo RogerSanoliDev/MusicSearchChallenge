@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Endpoint {
+public struct Endpoint: Sendable {
     private(set) var url: URL?
     
     public init(

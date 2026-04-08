@@ -9,6 +9,8 @@ DerivedData/
 *.xcuserstate
 *.xccheckout
 *.xcscmblueprint
+xcuserdata/
+*.xcuserdatad
 
 # Xcode Cloud / Archives
 *.xcarchive
