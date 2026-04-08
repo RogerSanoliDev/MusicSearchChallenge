@@ -7,16 +7,22 @@
 
 import Foundation
 
-public protocol APIClientProtocol {
+public protocol APIClientProtocol: Sendable {
     func performRequest<T:Decodable>(endpoint: Endpoint, session: URLSessionProtocol) async throws -> T
 }
 
-public final class APIClient: APIClientProtocol, Sendable {
+public extension APIClientProtocol {
+    func performRequest<T:Decodable>(endpoint: Endpoint) async throws -> T {
+        try await performRequest(endpoint: endpoint, session: URLSession.shared)
+    }
+}
+
+public final class APIClient: APIClientProtocol {
     
     public static let shared = APIClient()
     private init() {}
     
-    public func performRequest<T:Decodable>(endpoint: Endpoint, session: URLSessionProtocol = URLSession.shared) async throws -> T {
+    public func performRequest<T:Decodable>(endpoint: Endpoint, session: URLSessionProtocol) async throws -> T {
         guard let url = endpoint.url else { throw NetworkError.badURLFormat }
         
         let (data, response) = try await session.data(from: url)
