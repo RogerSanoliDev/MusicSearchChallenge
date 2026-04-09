@@ -15,7 +15,7 @@ protocol APISearchRepositoryProtocol: Sendable {
 final class APISearchRepository: APISearchRepositoryProtocol {
     private let client: APIClientProtocol
     
-    nonisolated init(client: APIClientProtocol) {
+    nonisolated init(client: APIClientProtocol = APIClient.shared) {
         self.client = client
     }
     

@@ -19,19 +19,11 @@
 			remoteGlobalIDString = DB0A5C6F2F8464AB008EF48A;
 			remoteInfo = MusicSearchChallenge;
 		};
-		DB0A5C8A2F8464AD008EF48A /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = DB0A5C682F8464AB008EF48A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = DB0A5C6F2F8464AB008EF48A;
-			remoteInfo = MusicSearchChallenge;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		DB0A5C702F8464AB008EF48A /* MusicSearchChallenge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicSearchChallenge.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB0A5C7F2F8464AD008EF48A /* MusicSearchChallengeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MusicSearchChallengeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		DB0A5C892F8464AD008EF48A /* MusicSearchChallengeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MusicSearchChallengeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -43,11 +35,6 @@
 		DB0A5C822F8464AD008EF48A /* MusicSearchChallengeTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = MusicSearchChallengeTests;
-			sourceTree = "<group>";
-		};
-		DB0A5C8C2F8464AD008EF48A /* MusicSearchChallengeUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MusicSearchChallengeUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -69,13 +56,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DB0A5C862F8464AD008EF48A /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -84,7 +64,6 @@
 			children = (
 				DB0A5C722F8464AB008EF48A /* MusicSearchChallenge */,
 				DB0A5C822F8464AD008EF48A /* MusicSearchChallengeTests */,
-				DB0A5C8C2F8464AD008EF48A /* MusicSearchChallengeUITests */,
 				DB1559132F8581B30042D6CA /* Frameworks */,
 				DB0A5C712F8464AB008EF48A /* Products */,
 			);
@@ -95,7 +74,6 @@
 			children = (
 				DB0A5C702F8464AB008EF48A /* MusicSearchChallenge.app */,
 				DB0A5C7F2F8464AD008EF48A /* MusicSearchChallengeTests.xctest */,
-				DB0A5C892F8464AD008EF48A /* MusicSearchChallengeUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -157,29 +135,6 @@
 			productReference = DB0A5C7F2F8464AD008EF48A /* MusicSearchChallengeTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		DB0A5C882F8464AD008EF48A /* MusicSearchChallengeUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DB0A5C992F8464AD008EF48A /* Build configuration list for PBXNativeTarget "MusicSearchChallengeUITests" */;
-			buildPhases = (
-				DB0A5C852F8464AD008EF48A /* Sources */,
-				DB0A5C862F8464AD008EF48A /* Frameworks */,
-				DB0A5C872F8464AD008EF48A /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				DB0A5C8B2F8464AD008EF48A /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				DB0A5C8C2F8464AD008EF48A /* MusicSearchChallengeUITests */,
-			);
-			name = MusicSearchChallengeUITests;
-			packageProductDependencies = (
-			);
-			productName = MusicSearchChallengeUITests;
-			productReference = DB0A5C892F8464AD008EF48A /* MusicSearchChallengeUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -197,10 +152,6 @@
 						CreatedOnToolsVersion = 26.3;
 						TestTargetID = DB0A5C6F2F8464AB008EF48A;
 					};
-					DB0A5C882F8464AD008EF48A = {
-						CreatedOnToolsVersion = 26.3;
-						TestTargetID = DB0A5C6F2F8464AB008EF48A;
-					};
 				};
 			};
 			buildConfigurationList = DB0A5C6B2F8464AB008EF48A /* Build configuration list for PBXProject "MusicSearchChallenge" */;
@@ -209,6 +160,8 @@
 			knownRegions = (
 				en,
 				Base,
+				"pt-BR",
+				"zh-Hans",
 			);
 			mainGroup = DB0A5C672F8464AB008EF48A;
 			minimizedProjectReferenceProxies = 1;
@@ -223,7 +176,6 @@
 			targets = (
 				DB0A5C6F2F8464AB008EF48A /* MusicSearchChallenge */,
 				DB0A5C7E2F8464AD008EF48A /* MusicSearchChallengeTests */,
-				DB0A5C882F8464AD008EF48A /* MusicSearchChallengeUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -237,13 +189,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		DB0A5C7D2F8464AD008EF48A /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DB0A5C872F8464AD008EF48A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -267,13 +212,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DB0A5C852F8464AD008EF48A /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -281,11 +219,6 @@
 			isa = PBXTargetDependency;
 			target = DB0A5C6F2F8464AB008EF48A /* MusicSearchChallenge */;
 			targetProxy = DB0A5C802F8464AD008EF48A /* PBXContainerItemProxy */;
-		};
-		DB0A5C8B2F8464AD008EF48A /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = DB0A5C6F2F8464AB008EF48A /* MusicSearchChallenge */;
-			targetProxy = DB0A5C8A2F8464AD008EF48A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -519,44 +452,6 @@
 			};
 			name = Release;
 		};
-		DB0A5C9A2F8464AD008EF48A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rogersanoli.MusicSearchChallengeUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = MusicSearchChallenge;
-			};
-			name = Debug;
-		};
-		DB0A5C9B2F8464AD008EF48A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rogersanoli.MusicSearchChallengeUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = MusicSearchChallenge;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -583,15 +478,6 @@
 			buildConfigurations = (
 				DB0A5C972F8464AD008EF48A /* Debug */,
 				DB0A5C982F8464AD008EF48A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		DB0A5C992F8464AD008EF48A /* Build configuration list for PBXNativeTarget "MusicSearchChallengeUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				DB0A5C9A2F8464AD008EF48A /* Debug */,
-				DB0A5C9B2F8464AD008EF48A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol URLSessionProtocol {
+public protocol URLSessionProtocol: Sendable {
     func data(from url: URL) async throws -> (Data, URLResponse)
 }
 
