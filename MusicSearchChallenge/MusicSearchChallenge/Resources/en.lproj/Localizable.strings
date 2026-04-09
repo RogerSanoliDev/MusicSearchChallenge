@@ -1,0 +1,6 @@
+"search.title" = "Songs";
+"search.screen.voiceover" = "Song search screen";
+"search.field.placeholder" = "Search songs";
+"search.idle.message" = "Start searching songs";
+"search.error.message" = "Something went wrong";
+"search.empty.message" = "No results found for \"%@\"";

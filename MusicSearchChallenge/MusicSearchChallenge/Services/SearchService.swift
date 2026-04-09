@@ -13,7 +13,7 @@ protocol SearchServiceProtocol: Sendable {
 final class SearchService: SearchServiceProtocol {
     private let apiRepository: APISearchRepositoryProtocol
     
-    nonisolated init(apiRepository: APISearchRepositoryProtocol) {
+    nonisolated init(apiRepository: APISearchRepositoryProtocol = APISearchRepository()) {
         self.apiRepository = apiRepository
     }
     

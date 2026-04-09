@@ -1,0 +1,6 @@
+"search.title" = "Músicas";
+"search.screen.voiceover" = "Tela de busca de músicas";
+"search.field.placeholder" = "Buscar músicas";
+"search.idle.message" = "Comece a procurar músicas";
+"search.error.message" = "Algo deu errado";
+"search.empty.message" = "Nenhum resultado encontrado para \"%@\"";

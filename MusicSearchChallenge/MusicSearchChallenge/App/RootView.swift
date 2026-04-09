@@ -17,7 +17,7 @@ struct RootView: View {
                 SplashView()
                     .transition(.opacity)
             } else {
-                ContentView()
+                SongSearchView()
             }
         }
         .preferredColorScheme(.dark)
