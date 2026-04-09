@@ -2,5 +2,7 @@
 "search.screen.voiceover" = "Tela de busca de músicas";
 "search.field.placeholder" = "Buscar músicas";
 "search.idle.message" = "Comece a procurar músicas";
+"search.loading.voiceover" = "Carregando músicas";
 "search.error.message" = "Algo deu errado";
 "search.empty.message" = "Nenhum resultado encontrado para \"%@\"";
+"song_list.row.voiceover" = "%1$@, de %2$@";

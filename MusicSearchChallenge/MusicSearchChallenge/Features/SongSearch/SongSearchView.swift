@@ -19,6 +19,7 @@ struct SongSearchView: View {
             contentView
                 .preferredColorScheme(.dark)
                 .navigationTitle(Text("search.title"))
+                .navigationBarTitleDisplayMode(.large)
         }
         .searchable(
             text: $viewModel.searchText,
@@ -39,9 +40,9 @@ struct SongSearchView: View {
         case .recent:
             Text("recent")
         case .loading:
-            Text("loading")
+            SongListLoadingView()
         case .success:
-            Text("success")
+            SongListView(songs: viewModel.songs)
         case .error:
             InfoView(
                 systemImageName: "exclamationmark.triangle",

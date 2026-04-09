@@ -27,6 +27,7 @@ struct InfoView: View {
         .foregroundStyle(.secondary)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.top, -100)
+        .preferredColorScheme(.dark)
     }
 }
 
