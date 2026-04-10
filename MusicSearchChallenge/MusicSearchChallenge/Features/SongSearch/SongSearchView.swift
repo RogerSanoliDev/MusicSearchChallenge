@@ -6,21 +6,28 @@
 //
 
 import SwiftUI
+import SongPlayer
 
 struct SongSearchView: View {
     @State private var viewModel = SongSearchViewModel()
+    private let onSongSelected: (Song) -> Void
+    private let onMoreOptionsSelected: (Song) -> Void
 
-    init(viewModel: SongSearchViewModel = SongSearchViewModel()) {
+    init(
+        viewModel: SongSearchViewModel = SongSearchViewModel(),
+        onSongSelected: @escaping (Song) -> Void = { _ in },
+        onMoreOptionsSelected: @escaping (Song) -> Void = { _ in }
+    ) {
         _viewModel = State(initialValue: viewModel)
+        self.onSongSelected = onSongSelected
+        self.onMoreOptionsSelected = onMoreOptionsSelected
     }
 
     var body: some View {
-        NavigationStack {
-            contentView
-                .preferredColorScheme(.dark)
-                .navigationTitle(Text("search.title"))
-                .navigationBarTitleDisplayMode(.large)
-        }
+        contentView
+            .preferredColorScheme(.dark)
+            .navigationTitle(Text("search.title"))
+            .navigationBarTitleDisplayMode(.large)
         .searchable(
             text: $viewModel.searchText,
             placement: .navigationBarDrawer(displayMode: .automatic),
@@ -42,7 +49,13 @@ struct SongSearchView: View {
         case .loading:
             SongListLoadingView()
         case .success:
-            SongListView(songs: viewModel.songs)
+            SongListView(
+                songs: viewModel.songs,
+                onSongSelected: { index in
+                    onSongSelected(viewModel.songs[index])
+                },
+                onMoreOptionsSelected: onMoreOptionsSelected
+            )
         case .error:
             InfoView(
                 systemImageName: "exclamationmark.triangle",

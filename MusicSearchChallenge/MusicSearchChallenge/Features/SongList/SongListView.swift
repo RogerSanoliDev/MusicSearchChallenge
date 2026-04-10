@@ -11,85 +11,39 @@ import SongPlayer
 struct SongListView: View {
     let songs: [Song]
     private let isPlaylist: Bool
+    private let onSongSelected: (Int) -> Void
+    private let onMoreOptionsSelected: ((Song) -> Void)?
 
-    init(songs: [Song], isPlaylist: Bool = false) {
+    init(
+        songs: [Song],
+        isPlaylist: Bool = false,
+        onSongSelected: @escaping (Int) -> Void = { _ in },
+        onMoreOptionsSelected: ((Song) -> Void)? = nil
+    ) {
         self.songs = songs
         self.isPlaylist = isPlaylist
+        self.onSongSelected = onSongSelected
+        self.onMoreOptionsSelected = onMoreOptionsSelected
     }
 
     var body: some View {
         List(Array(songs.enumerated()), id: \.element.trackID) { index, song in
-            NavigationLink {
-                SongPlayerView(
-                    songs: isPlaylist ? songs : [song],
-                    startIndex: isPlaylist ? index : 0
-                )
-            } label: {
-                row(for: song)
+            SongCell(
+                song: song,
+                showsMoreOptionsButton: !isPlaylist,
+                onMoreOptionsTap: {
+                    onMoreOptionsSelected?(song)
+                }
+            )
+            .contentShape(Rectangle())
+            .onTapGesture {
+                onSongSelected(index)
             }
             .listRowSeparator(.hidden)
         }
         .preferredColorScheme(.dark)
         .listStyle(.plain)
         .scrollIndicators(.hidden)
-    }
-
-    private var placeholderArtwork: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.secondary.opacity(0.15))
-
-            Image(systemName: "music.note")
-                .foregroundStyle(.secondary)
-        }
-        .accessibilityHidden(true)
-    }
-
-    private func row(for song: Song) -> some View {
-        HStack(spacing: 12) {
-            AsyncImage(url: song.artworkURL60) { phase in
-                switch phase {
-                case .success(let image):
-                    image
-                        .resizable()
-                        .scaledToFill()
-                case .failure, .empty:
-                    placeholderArtwork
-                @unknown default:
-                    placeholderArtwork
-                }
-            }
-            .frame(width: 60, height: 60)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .accessibilityHidden(true)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(song.trackName)
-                    .font(.headline)
-                    .lineLimit(1)
-
-                Text(song.artistName)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-            }
-
-            Spacer(minLength: 0)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(
-            Text(
-                String.localizedStringWithFormat(
-                    NSLocalizedString(
-                        "song_list.row.voiceover",
-                        comment: "VoiceOver label for a song row with track name and artist name"
-                    ),
-                    song.trackName,
-                    song.artistName
-                )
-            )
-        )
     }
 }
 

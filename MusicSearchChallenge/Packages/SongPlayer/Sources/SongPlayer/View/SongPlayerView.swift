@@ -24,7 +24,7 @@ public struct SongPlayerView: View {
         )
     }
 
-    public init(viewModel: SongPlayerViewModel) {
+    init(viewModel: SongPlayerViewModel) {
         _viewModel = State(initialValue: viewModel)
     }
 

@@ -8,6 +8,7 @@
 import SnapshotTesting
 import Testing
 import SongPlayer
+import SwiftUI
 @testable import MusicSearchChallenge
 
 @MainActor
@@ -18,7 +19,9 @@ struct SongSearchViewTests {
         viewModel.state = .idle
 
         assertSnapshot(
-            of: SongSearchView(viewModel: viewModel),
+            of: NavigationStack {
+                SongSearchView(viewModel: viewModel)
+            },
             as: .image(layout: .device(config: .iPhone13))
         )
     }
@@ -29,7 +32,9 @@ struct SongSearchViewTests {
         viewModel.state = .error
 
         assertSnapshot(
-            of: SongSearchView(viewModel: viewModel),
+            of: NavigationStack {
+                SongSearchView(viewModel: viewModel)
+            },
             as: .image(layout: .device(config: .iPhone13))
         )
     }
@@ -41,7 +46,9 @@ struct SongSearchViewTests {
         viewModel.state = .empty
 
         assertSnapshot(
-            of: SongSearchView(viewModel: viewModel),
+            of: NavigationStack {
+                SongSearchView(viewModel: viewModel)
+            },
             as: .image(layout: .device(config: .iPhone13))
         )
     }
@@ -52,7 +59,9 @@ struct SongSearchViewTests {
         viewModel.state = .loading
 
         assertSnapshot(
-            of: SongSearchView(viewModel: viewModel),
+            of: NavigationStack {
+                SongSearchView(viewModel: viewModel)
+            },
             as: .image(layout: .device(config: .iPhone13))
         )
     }
@@ -70,7 +79,9 @@ struct SongSearchViewTests {
         ]
 
         assertSnapshot(
-            of: SongSearchView(viewModel: viewModel),
+            of: NavigationStack {
+                SongSearchView(viewModel: viewModel)
+            },
             as: .image(layout: .device(config: .iPhone13))
         )
     }

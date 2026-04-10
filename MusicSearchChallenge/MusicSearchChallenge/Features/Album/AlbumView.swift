@@ -10,9 +10,15 @@ import SongPlayer
 
 struct AlbumView: View {
     @State private var viewModel: AlbumViewModel
+    private let onSongSelected: (([Song], Int) -> Void)?
 
-    init(song: Song, viewModel: AlbumViewModel? = nil) {
+    init(
+        song: Song,
+        viewModel: AlbumViewModel? = nil,
+        onSongSelected: (([Song], Int) -> Void)? = nil
+    ) {
         _viewModel = State(initialValue: viewModel ?? AlbumViewModel(song: song))
+        self.onSongSelected = onSongSelected
     }
 
     var body: some View {
@@ -26,7 +32,13 @@ struct AlbumView: View {
             case .success:
                 VStack(spacing: 0) {
                     headerView
-                    SongListView(songs: viewModel.songs, isPlaylist: true)
+                    SongListView(
+                        songs: viewModel.songs,
+                        isPlaylist: true,
+                        onSongSelected: { startIndex in
+                            onSongSelected?(viewModel.songs, startIndex)
+                        }
+                    )
                 }
             case .error:
                 VStack(spacing: 0) {
@@ -47,7 +59,12 @@ struct AlbumView: View {
 
     private var headerView: some View {
         VStack(spacing: 16) {
-            artworkView
+            Thumbnail(
+                url: viewModel.song.artworkURL100,
+                size: 100,
+                cornerRadius: 18,
+                iconSize: 44
+            )
 
             VStack(spacing: 6) {
                 Text(viewModel.song.collectionName)
@@ -63,36 +80,6 @@ struct AlbumView: View {
         .padding(.horizontal, 24)
         .padding(.top, 24)
         .padding(.bottom, 20)
-    }
-
-    @ViewBuilder
-    private var artworkView: some View {
-        AsyncImage(url: viewModel.song.artworkURL100) { phase in
-            switch phase {
-            case .success(let image):
-                image
-                    .resizable()
-                    .scaledToFill()
-            case .failure, .empty:
-                placeholderArtwork
-            @unknown default:
-                placeholderArtwork
-            }
-        }
-        .frame(width: 100, height: 100)
-        .clipShape(RoundedRectangle(cornerRadius: 18))
-        .accessibilityHidden(true)
-    }
-
-    private var placeholderArtwork: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 18)
-                .fill(Color.secondary.opacity(0.15))
-
-            Image(systemName: "music.note")
-                .font(.system(size: 44, weight: .medium))
-                .foregroundStyle(.secondary)
-        }
     }
 }
 
