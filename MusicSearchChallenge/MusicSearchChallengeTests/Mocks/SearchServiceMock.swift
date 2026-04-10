@@ -16,13 +16,25 @@ actor SearchServiceMock: SearchServiceProtocol {
         let offset: Int
     }
 
+    struct FetchAlbumCall: Equatable {
+        let collectionId: Int
+    }
+
     var searchCalls: [SearchCall] = []
+    var fetchAlbumCalls: [FetchAlbumCall] = []
     var searchHandler: (@Sendable (String, Int, Int) async throws -> [Song])?
+    var fetchAlbumHandler: (@Sendable (Int) async throws -> [Song])?
 
     func setSearchHandler(
         _ handler: @escaping @Sendable (String, Int, Int) async throws -> [Song]
     ) {
         searchHandler = handler
+    }
+
+    func setFetchAlbumHandler(
+        _ handler: @escaping @Sendable (Int) async throws -> [Song]
+    ) {
+        fetchAlbumHandler = handler
     }
 
     func search(term: String, limit: Int, offset: Int) async throws -> [Song] {
@@ -36,6 +48,12 @@ actor SearchServiceMock: SearchServiceProtocol {
     }
 
     func fetchAlbum(collectionId: Int) async throws -> [Song] {
-        fatalError("fetchAlbum should not be called in these tests")
+        fetchAlbumCalls.append(FetchAlbumCall(collectionId: collectionId))
+
+        guard let fetchAlbumHandler else {
+            fatalError("fetchAlbumHandler not set on SearchServiceMock")
+        }
+
+        return try await fetchAlbumHandler(collectionId)
     }
 }
