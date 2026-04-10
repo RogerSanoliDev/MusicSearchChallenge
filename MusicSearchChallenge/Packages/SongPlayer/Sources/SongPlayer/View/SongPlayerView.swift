@@ -124,6 +124,7 @@ public struct SongPlayerView: View {
         .background(Color.black.ignoresSafeArea())
         .navigationTitle(viewModel.albumName)
         .navigationBarTitleDisplayMode(.inline)
+
         .task {
             viewModel.onAppear()
         }
