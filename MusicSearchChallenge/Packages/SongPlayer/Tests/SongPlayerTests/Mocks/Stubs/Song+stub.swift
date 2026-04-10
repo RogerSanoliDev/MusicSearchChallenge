@@ -1,13 +1,12 @@
 //
 //  Song+stub.swift
-//  MusicSearchChallenge
+//  SongPlayer
 //
-//  Created by Codex on 09/04/26.
+//  Created by Roger dos Santos Oliveira on 10/04/26.
 //
 
-import Foundation
 import SongPlayer
-@testable import MusicSearchChallenge
+import Foundation
 
 extension Song {
     static func stub(

@@ -7,6 +7,7 @@
 
 import SnapshotTesting
 import Testing
+import SongPlayer
 @testable import MusicSearchChallenge
 
 @MainActor

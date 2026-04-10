@@ -8,6 +8,7 @@
 import Testing
 @testable import MusicSearchChallenge
 import Networking
+import SongPlayer
 
 struct SearchServiceTests {
     @Test

@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		DB1559152F8581B30042D6CA /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = DB1559142F8581B30042D6CA /* Networking */; };
 		DB155AAE2F870E120042D6CA /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = DB155AAD2F870E120042D6CA /* SnapshotTesting */; };
+		DD1A1B1C2D3E4F5001020304 /* SongPlayer in Frameworks */ = {isa = PBXBuildFile; productRef = DD1A1B1C2D3E4F5001020305 /* SongPlayer */; };
+		DD1A1B1C2D3E4F5001020306 /* SongPlayer in Frameworks */ = {isa = PBXBuildFile; productRef = DD1A1B1C2D3E4F5001020305 /* SongPlayer */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +47,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DB1559152F8581B30042D6CA /* Networking in Frameworks */,
+				DD1A1B1C2D3E4F5001020304 /* SongPlayer in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,6 +56,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DB155AAE2F870E120042D6CA /* SnapshotTesting in Frameworks */,
+				DD1A1B1C2D3E4F5001020306 /* SongPlayer in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -64,7 +68,6 @@
 			children = (
 				DB0A5C722F8464AB008EF48A /* MusicSearchChallenge */,
 				DB0A5C822F8464AD008EF48A /* MusicSearchChallengeTests */,
-				DB1559132F8581B30042D6CA /* Frameworks */,
 				DB0A5C712F8464AB008EF48A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -76,13 +79,6 @@
 				DB0A5C7F2F8464AD008EF48A /* MusicSearchChallengeTests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		DB1559132F8581B30042D6CA /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -106,6 +102,7 @@
 			name = MusicSearchChallenge;
 			packageProductDependencies = (
 				DB1559142F8581B30042D6CA /* Networking */,
+				DD1A1B1C2D3E4F5001020305 /* SongPlayer */,
 			);
 			productName = MusicSearchChallenge;
 			productReference = DB0A5C702F8464AB008EF48A /* MusicSearchChallenge.app */;
@@ -130,6 +127,7 @@
 			name = MusicSearchChallengeTests;
 			packageProductDependencies = (
 				DB155AAD2F870E120042D6CA /* SnapshotTesting */,
+				DD1A1B1C2D3E4F5001020305 /* SongPlayer */,
 			);
 			productName = MusicSearchChallengeTests;
 			productReference = DB0A5C7F2F8464AD008EF48A /* MusicSearchChallengeTests.xctest */;
@@ -167,6 +165,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				DB8E7E952F85787A001E3A78 /* XCLocalSwiftPackageReference "Packages/Networking" */,
+				DD1A1B1C2D3E4F5001020307 /* XCLocalSwiftPackageReference "Packages/SongPlayer" */,
 				DB155AAC2F870E120042D6CA /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -489,6 +488,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Packages/Networking;
 		};
+		DD1A1B1C2D3E4F5001020307 /* XCLocalSwiftPackageReference "Packages/SongPlayer" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/SongPlayer;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -512,6 +515,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DB155AAC2F870E120042D6CA /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
 			productName = SnapshotTesting;
+		};
+		DD1A1B1C2D3E4F5001020305 /* SongPlayer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DD1A1B1C2D3E4F5001020307 /* XCLocalSwiftPackageReference "Packages/SongPlayer" */;
+			productName = SongPlayer;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
