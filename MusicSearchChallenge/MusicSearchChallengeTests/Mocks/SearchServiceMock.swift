@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SongPlayer
 @testable import MusicSearchChallenge
 
 actor SearchServiceMock: SearchServiceProtocol {

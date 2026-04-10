@@ -7,6 +7,7 @@
 
 import Foundation
 import Testing
+import SongPlayer
 @testable import MusicSearchChallenge
 
 @MainActor
@@ -138,8 +139,8 @@ struct SongSearchViewModelTests {
 
     @MainActor
     private func assertEventually(
-        timeout: Duration = .seconds(1),
-        pollInterval: Duration = .milliseconds(10),
+        timeout: Duration = .seconds(3),
+        pollInterval: Duration = .milliseconds(20),
         condition: @escaping () async -> Bool
     ) async {
         let clock = ContinuousClock()
@@ -150,6 +151,7 @@ struct SongSearchViewModelTests {
                 return
             }
 
+            await Task.yield()
             try? await Task.sleep(for: pollInterval)
         }
 

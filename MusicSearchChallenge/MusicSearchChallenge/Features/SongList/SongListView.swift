@@ -6,13 +6,18 @@
 //
 
 import SwiftUI
+import SongPlayer
 
 struct SongListView: View {
     let songs: [Song]
 
     var body: some View {
         List(songs, id: \.trackID) { song in
-            row(for: song)
+            NavigationLink {
+                SongPlayerView(songs: [song], startIndex: 0)
+            } label: {
+                row(for: song)
+            }
         }
         .preferredColorScheme(.dark)
         .listStyle(.plain)
