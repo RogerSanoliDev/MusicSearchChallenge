@@ -5,4 +5,5 @@
 "search.loading.voiceover" = "正在加载歌曲";
 "search.error.message" = "出了点问题";
 "search.empty.message" = "没有找到“%@”的结果";
+"album.empty.message" = "未找到此专辑的歌曲";
 "song_list.row.voiceover" = "%2$@的%1$@";

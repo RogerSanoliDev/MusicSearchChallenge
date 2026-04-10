@@ -23,7 +23,6 @@ struct SongListLoadingView: View {
                 Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 10)
             .listRowSeparator(.hidden)
             .listRowBackground(Color.clear)
             .accessibilityHidden(true)

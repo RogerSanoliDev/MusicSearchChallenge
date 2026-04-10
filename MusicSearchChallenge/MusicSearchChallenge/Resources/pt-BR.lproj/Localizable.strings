@@ -5,4 +5,5 @@
 "search.loading.voiceover" = "Carregando músicas";
 "search.error.message" = "Algo deu errado";
 "search.empty.message" = "Nenhum resultado encontrado para \"%@\"";
+"album.empty.message" = "Nenhuma música encontrada para este álbum";
 "song_list.row.voiceover" = "%1$@, de %2$@";

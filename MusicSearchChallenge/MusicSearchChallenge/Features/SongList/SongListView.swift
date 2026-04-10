@@ -10,14 +10,24 @@ import SongPlayer
 
 struct SongListView: View {
     let songs: [Song]
+    private let isPlaylist: Bool
+
+    init(songs: [Song], isPlaylist: Bool = false) {
+        self.songs = songs
+        self.isPlaylist = isPlaylist
+    }
 
     var body: some View {
-        List(songs, id: \.trackID) { song in
+        List(Array(songs.enumerated()), id: \.element.trackID) { index, song in
             NavigationLink {
-                SongPlayerView(songs: [song], startIndex: 0)
+                SongPlayerView(
+                    songs: isPlaylist ? songs : [song],
+                    startIndex: isPlaylist ? index : 0
+                )
             } label: {
                 row(for: song)
             }
+            .listRowSeparator(.hidden)
         }
         .preferredColorScheme(.dark)
         .listStyle(.plain)
@@ -67,7 +77,6 @@ struct SongListView: View {
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.vertical, 10)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(
             Text(
