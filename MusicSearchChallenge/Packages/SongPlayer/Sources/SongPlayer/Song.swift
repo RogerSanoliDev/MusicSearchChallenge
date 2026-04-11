@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Song: Sendable, Equatable {
+public struct Song: Sendable, Equatable, Identifiable {
     public let collectionID: Int
     public let trackID: Int
     public let artistName: String
@@ -37,5 +37,9 @@ public struct Song: Sendable, Equatable {
         self.artworkURL100 = artworkURL100
         self.trackTimeMillis = trackTimeMillis
         self.isStreamable = isStreamable
+    }
+    
+    public var id: Int {
+        trackID
     }
 }

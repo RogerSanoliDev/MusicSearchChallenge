@@ -17,9 +17,8 @@ struct AlbumViewTests {
     func albumView_loading_matchesSnapshot() {
         let viewModel = AlbumViewModel(
             song: .stub(
-                artistName: "Daft Punk",
-                collectionName: "Discovery",
-                artworkURL100: nil
+                artistName: "Angine de Poitrine",
+                collectionName: "Vol.II"
             )
         )
         viewModel.state = .loading
@@ -35,18 +34,29 @@ struct AlbumViewTests {
     @Test(.snapshots(record: .missing))
     func albumView_success_matchesSnapshot() {
         let song = Song.stub(
-            collectionID: 42,
-            artistName: "Daft Punk",
-            collectionName: "Discovery",
-            artworkURL100: nil
+            artistName: "Angine de Poitrine",
+            collectionName: "Vol.II",
+            artworkURL100: URL(string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/54/91/db/5491db35-84a9-b4e5-83cc-b52fdf678bb2/11115.jpg/100x100bb.jpg")
         )
         let viewModel = AlbumViewModel(song: song)
         viewModel.state = .success
         viewModel.songs = [
-            .stub(collectionID: 42, trackID: 1, artistName: "Daft Punk", collectionName: "Discovery", trackName: "One More Time"),
-            .stub(collectionID: 42, trackID: 2, artistName: "Daft Punk", collectionName: "Discovery", trackName: "Aerodynamic"),
-            .stub(collectionID: 42, trackID: 3, artistName: "Daft Punk", collectionName: "Discovery", trackName: "Digital Love"),
-            .stub(collectionID: 42, trackID: 4, artistName: "Daft Punk", collectionName: "Discovery", trackName: "Harder, Better, Faster, Stronger"),
+            .stub(trackID: 1,
+                  artistName: "Angine de Poitrine",
+                  collectionName: "Vol.II",
+                  trackName: "Fabienk"),
+            .stub(trackID: 2,
+                  artistName: "Angine de Poitrine",
+                  collectionName: "Vol.II",
+                  trackName: "Mata Zyklek"),
+            .stub(trackID: 3,
+                  artistName: "Angine de Poitrine",
+                  collectionName: "Vol.II",
+                  trackName: "Sarniezz"),
+            .stub(trackID: 4,
+                  artistName: "Angine de Poitrine",
+                  collectionName: "Vol.II",
+                  trackName: "Utzp")
         ]
 
         assertSnapshot(

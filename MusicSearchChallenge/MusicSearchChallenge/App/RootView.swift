@@ -10,6 +10,7 @@ import SwiftData
 
 struct RootView: View {
     @State private var isShowingSplash = true
+    @State private var coordinator = AppCoordinator()
 
     var body: some View {
         Group {
@@ -17,7 +18,15 @@ struct RootView: View {
                 SplashView()
                     .transition(.opacity)
             } else {
-                SongSearchView()
+                NavigationStack(path: $coordinator.path) {
+                    coordinator.build(page: coordinator.rootPage)
+                        .navigationDestination(for: AppCoordinator.Page.self) { page in
+                            coordinator.build(page: page)
+                        }
+                }
+                .sheet(item: $coordinator.sheet) { page in
+                    coordinator.buildSheet(page: page)
+                }
             }
         }
         .preferredColorScheme(.dark)
