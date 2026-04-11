@@ -1,5 +1,5 @@
 //
-//  SongListLoadingView.swift
+//  SongCellLoadingView.swift
 //  MusicSearchChallenge
 //
 //  Created by Codex on 09/04/26.
@@ -7,32 +7,22 @@
 
 import SwiftUI
 
-struct SongListLoadingView: View {
-    private let placeholderRows = Array(0..<5)
-
+struct SongCellLoadingView: View {
     var body: some View {
-        List(placeholderRows, id: \.self) { _ in
-            HStack(spacing: 12) {
-                shimmerBlock(width: 60, height: 60, cornerRadius: 8)
+        HStack(spacing: 12) {
+            shimmerBlock(width: 60, height: 60, cornerRadius: 8)
 
-                VStack(alignment: .leading, spacing: 8) {
-                    shimmerBlock(width: 180, height: 20, cornerRadius: 6)
-                    shimmerBlock(width: 120, height: 16, cornerRadius: 6)
-                }
-
-                Spacer(minLength: 0)
+            VStack(alignment: .leading, spacing: 8) {
+                shimmerBlock(width: 180, height: 20, cornerRadius: 6)
+                shimmerBlock(width: 120, height: 16, cornerRadius: 6)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .listRowSeparator(.hidden)
-            .listRowBackground(Color.clear)
-            .accessibilityHidden(true)
+
+            Spacer(minLength: 0)
         }
-        .preferredColorScheme(.dark)
-        .listStyle(.plain)
-        .scrollDisabled(true)
-        .scrollIndicators(.hidden)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("search.loading.voiceover"))
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .accessibilityHidden(true)
     }
 
     private func shimmerBlock(width: CGFloat, height: CGFloat, cornerRadius: CGFloat) -> some View {
@@ -81,5 +71,5 @@ private struct ShimmerModifier: ViewModifier {
 }
 
 #Preview {
-    SongListLoadingView()
+    SongCellLoadingView()
 }

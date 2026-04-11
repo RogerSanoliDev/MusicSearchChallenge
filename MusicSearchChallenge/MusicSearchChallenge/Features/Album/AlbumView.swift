@@ -27,7 +27,17 @@ struct AlbumView: View {
             case .loading:
                 VStack(spacing: 0) {
                     headerView
-                    SongListLoadingView()
+                    List(0..<10, id: \.self) { _ in
+                        SongCellLoadingView()
+                            .listRowInsets(EdgeInsets())
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                    }
+                    .listStyle(.plain)
+                    .scrollDisabled(true)
+                    .scrollIndicators(.hidden)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(Text("search.loading.voiceover"))
                 }
             case .success:
                 VStack(spacing: 0) {

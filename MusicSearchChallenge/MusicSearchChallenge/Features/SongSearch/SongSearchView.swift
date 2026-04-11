@@ -28,12 +28,16 @@ struct SongSearchView: View {
             .preferredColorScheme(.dark)
             .navigationTitle(Text("search.title"))
             .navigationBarTitleDisplayMode(.large)
-        .searchable(
-            text: $viewModel.searchText,
-            placement: .navigationBarDrawer(displayMode: .automatic),
-            prompt: Text("search.field.placeholder")
-        )
-        .accessibilityLabel(Text("search.screen.voiceover"))
+            .searchable(
+                text: $viewModel.searchText,
+                placement: .navigationBarDrawer(displayMode: .always),
+                prompt: Text("search.field.placeholder")
+            )
+            .refreshable {
+                await viewModel.reloadSearch()
+            }
+            .animation(.easeInOut(duration: 0.2), value: viewModel.state)
+            .accessibilityLabel(Text("search.screen.voiceover"))
     }
 
     @ViewBuilder
@@ -47,14 +51,28 @@ struct SongSearchView: View {
         case .recent:
             Text("recent")
         case .loading:
-            SongListLoadingView()
+            List(0..<10, id: \.self) { _ in
+                SongCellLoadingView()
+                    .listRowInsets(EdgeInsets())
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+            }
+            .listStyle(.plain)
+            .scrollDisabled(true)
+            .scrollIndicators(.hidden)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text("search.loading.voiceover"))
         case .success:
             SongListView(
                 songs: viewModel.songs,
+                showsPaginationLoader: viewModel.hasMorePages,
                 onSongSelected: { index in
                     onSongSelected(viewModel.songs[index])
                 },
-                onMoreOptionsSelected: onMoreOptionsSelected
+                onMoreOptionsSelected: onMoreOptionsSelected,
+                onReachedBottom: {
+                    viewModel.loadNextPageIfNeeded()
+                }
             )
         case .error:
             InfoView(

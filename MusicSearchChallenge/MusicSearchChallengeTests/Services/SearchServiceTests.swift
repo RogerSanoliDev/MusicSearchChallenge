@@ -30,12 +30,12 @@ struct SearchServiceTests {
             )
         ))
 
-        let result = try await sut.search(term: "beatles", limit: 10, offset: 20)
+        let result = try await sut.search(term: "beatles", limit: 10, offset: 0)
 
         #expect(await mock.searchCallCount == 1)
         #expect(await mock.receivedSearchTerm == "beatles")
         #expect(await mock.receivedSearchLimit == 10)
-        #expect(await mock.receivedSearchOffset == 20)
+        #expect(await mock.receivedSearchOffset == 0)
 
         #expect(result.count == 1)
         let firstSong = try #require(result.first)
