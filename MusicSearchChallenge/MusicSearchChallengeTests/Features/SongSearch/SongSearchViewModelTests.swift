@@ -38,6 +38,7 @@ struct SongSearchViewModelTests {
                 && sut.state == .success
                 && sut.songs.count == 1
                 && sut.songs.first?.trackName == "Bohemian Rhapsody"
+                && sut.hasMorePages
         }
     }
 
@@ -135,6 +136,205 @@ struct SongSearchViewModelTests {
                 && sut.state == .idle
                 && sut.songs.isEmpty
         }
+    }
+
+    @Test
+    func loadNextPageIfNeeded_appendsSongsAndUpdatesOffset() async throws {
+        let mock = SearchServiceMock()
+        await mock.setSearchHandler { term, limit, offset in
+            #expect(term == "queen")
+            #expect(limit == 10)
+
+            if offset == 0 {
+                return (1...10).map {
+                    .stub(trackID: $0, artistName: "Queen", trackName: "Song \($0)")
+                }
+            }
+
+            #expect(offset == 10)
+            return (11...20).map {
+                .stub(trackID: $0, artistName: "Queen", trackName: "Song \($0)")
+            }
+        }
+
+        let sut = SongSearchViewModel(
+            searchService: mock,
+            searchDebounceDuration: .zero
+        )
+
+        sut.searchText = "queen"
+
+        await assertEventually {
+            sut.state == .success
+                && sut.songs.count == 10
+                && sut.hasMorePages
+        }
+
+        sut.loadNextPageIfNeeded()
+
+        await assertEventually {
+            let calls = await mock.searchCalls
+            return calls.count == 2
+                && calls.map(\.offset) == [0, 10]
+                && sut.songs.count == 20
+                && sut.songs.last?.trackID == 20
+                && sut.hasMorePages
+                && sut.isLoadingNextPage == false
+        }
+    }
+
+    @Test
+    func loadNextPageIfNeeded_whenNextPageAddsUniqueSongs_keepsPaginationEnabled() async throws {
+        let mock = SearchServiceMock()
+        await mock.setSearchHandler { _, _, offset in
+            if offset == 0 {
+                return (1...10).map {
+                    .stub(trackID: $0, artistName: "Queen", trackName: "Song \($0)")
+                }
+            }
+
+            return [
+                .stub(trackID: 11, artistName: "Queen", trackName: "Song 11"),
+                .stub(trackID: 12, artistName: "Queen", trackName: "Song 12"),
+            ]
+        }
+
+        let sut = SongSearchViewModel(
+            searchService: mock,
+            searchDebounceDuration: .zero
+        )
+
+        sut.searchText = "queen"
+
+        await assertEventually {
+            sut.state == .success
+                && sut.songs.count == 10
+                && sut.hasMorePages
+        }
+
+        sut.loadNextPageIfNeeded()
+
+        await assertEventually {
+            sut.songs.count == 12
+                && sut.hasMorePages
+                && sut.isLoadingNextPage == false
+        }
+    }
+
+    @Test
+    func loadNextPageIfNeeded_whenNextPageOnlyContainsDuplicates_stopsPagination() async throws {
+        let mock = SearchServiceMock()
+        await mock.setSearchHandler { _, _, offset in
+            if offset == 0 {
+                return (1...10).map {
+                    .stub(trackID: $0, artistName: "Queen", trackName: "Song \($0)")
+                }
+            }
+
+            return (1...10).map {
+                .stub(trackID: $0, artistName: "Queen", trackName: "Song \($0)")
+            }
+        }
+
+        let sut = SongSearchViewModel(
+            searchService: mock,
+            searchDebounceDuration: .zero
+        )
+
+        sut.searchText = "queen"
+
+        await assertEventually {
+            sut.state == .success
+                && sut.songs.count == 10
+                && sut.hasMorePages
+        }
+
+        sut.loadNextPageIfNeeded()
+
+        await assertEventually {
+            sut.songs.count == 10
+                && sut.hasMorePages == false
+                && sut.isLoadingNextPage == false
+        }
+    }
+
+    @Test
+    func reloadSearch_afterPagination_reloadsFirstPageAndResetsResults() async throws {
+        let mock = SearchServiceMock()
+        await mock.setSearchHandler { _, _, offset in
+            switch offset {
+            case 0:
+                return [
+                    .stub(trackID: 101, artistName: "Queen", trackName: "Refreshed 1"),
+                    .stub(trackID: 102, artistName: "Queen", trackName: "Refreshed 2"),
+                ]
+            case 10:
+                return [
+                    .stub(trackID: 201, artistName: "Queen", trackName: "Paged 1"),
+                    .stub(trackID: 202, artistName: "Queen", trackName: "Paged 2"),
+                ]
+            default:
+                Issue.record("Unexpected offset \(offset)")
+                return []
+            }
+        }
+
+        let sut = SongSearchViewModel(
+            searchService: mock,
+            searchDebounceDuration: .zero
+        )
+
+        sut.searchText = "queen"
+
+        await assertEventually {
+            sut.state == .success
+                && sut.songs.map(\.trackID) == [101, 102]
+                && sut.hasMorePages
+        }
+
+        sut.loadNextPageIfNeeded()
+
+        await assertEventually {
+            sut.songs.map(\.trackID) == [101, 102, 201, 202]
+                && sut.isLoadingNextPage == false
+        }
+
+        await sut.reloadSearch()
+
+        await assertEventually {
+            let calls = await mock.searchCalls
+            return calls.map(\.offset) == [0, 10, 0]
+                && sut.state == .success
+                && sut.songs.map(\.trackID) == [101, 102]
+                && sut.isLoadingNextPage == false
+                && sut.hasMorePages
+        }
+    }
+
+    @Test
+    func reloadSearch_withBlankQuery_resetsToIdleWithoutRequest() async throws {
+        let mock = SearchServiceMock()
+        await mock.setSearchHandler { _, _, _ in
+            [.stub(trackID: 1, artistName: "Queen", trackName: "Bohemian Rhapsody")]
+        }
+
+        let sut = SongSearchViewModel(
+            searchService: mock,
+            searchDebounceDuration: .zero
+        )
+        sut.searchText = "   "
+        sut.state = .success
+        sut.songs = [.stub(trackID: 99, artistName: "Queen", trackName: "Old Song")]
+        sut.hasMorePages = true
+        sut.isLoadingNextPage = true
+
+        await sut.reloadSearch()
+
+        #expect(await mock.searchCalls.isEmpty)
+        #expect(sut.state == .idle)
+        #expect(sut.songs.isEmpty)
+        #expect(sut.hasMorePages == false)
+        #expect(sut.isLoadingNextPage == false)
     }
 
     @MainActor

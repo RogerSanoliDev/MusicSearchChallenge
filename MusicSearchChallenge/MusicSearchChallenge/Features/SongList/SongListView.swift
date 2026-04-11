@@ -11,39 +11,56 @@ import SongPlayer
 struct SongListView: View {
     let songs: [Song]
     private let isPlaylist: Bool
+    private let showsPaginationLoader: Bool
     private let onSongSelected: (Int) -> Void
     private let onMoreOptionsSelected: ((Song) -> Void)?
-
+    private let onReachedBottom: (() -> Void)?
+    
     init(
         songs: [Song],
         isPlaylist: Bool = false,
+        showsPaginationLoader: Bool = true,
         onSongSelected: @escaping (Int) -> Void = { _ in },
-        onMoreOptionsSelected: ((Song) -> Void)? = nil
+        onMoreOptionsSelected: ((Song) -> Void)? = nil,
+        onReachedBottom: (() -> Void)? = nil
     ) {
         self.songs = songs
         self.isPlaylist = isPlaylist
+        self.showsPaginationLoader = showsPaginationLoader
         self.onSongSelected = onSongSelected
         self.onMoreOptionsSelected = onMoreOptionsSelected
+        self.onReachedBottom = onReachedBottom
     }
-
+    
     var body: some View {
-        List(Array(songs.enumerated()), id: \.element.trackID) { index, song in
-            SongCell(
-                song: song,
-                showsMoreOptionsButton: !isPlaylist,
-                onMoreOptionsTap: {
-                    onMoreOptionsSelected?(song)
+        ScrollView {
+            LazyVStack(spacing: 0) {
+                ForEach(Array(songs.enumerated()), id: \.element.trackID) { index, song in
+                    SongCell(
+                        song: song,
+                        showsMoreOptionsButton: !isPlaylist,
+                        onMoreOptionsTap: {
+                            onMoreOptionsSelected?(song)
+                        }
+                    )
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        onSongSelected(index)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
                 }
-            )
-            .contentShape(Rectangle())
-            .onTapGesture {
-                onSongSelected(index)
+
+                if showsPaginationLoader && !isPlaylist {
+                    SongCellLoadingView()
+                        .onAppear {
+                            onReachedBottom?()
+                        }
+                }
             }
-            .listRowSeparator(.hidden)
         }
-        .preferredColorScheme(.dark)
-        .listStyle(.plain)
         .scrollIndicators(.hidden)
+        .preferredColorScheme(.dark)
     }
 }
 
