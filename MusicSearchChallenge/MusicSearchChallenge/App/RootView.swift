@@ -30,7 +30,7 @@ struct RootView: View {
             }
         }
         .preferredColorScheme(.dark)
-        .animation(.easeInOut(duration: 0.2), value: isShowingSplash)
+        .animation(.easeInOut(duration: 0.3), value: isShowingSplash)
         .task {
             try? await Task.sleep(for: .seconds(1.2))
             isShowingSplash = false
