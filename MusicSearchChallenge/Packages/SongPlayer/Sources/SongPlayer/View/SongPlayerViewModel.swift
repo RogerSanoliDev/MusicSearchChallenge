@@ -7,6 +7,7 @@
 
 import Foundation
 import Observation
+import Networking
 
 @Observable
 @MainActor
@@ -24,6 +25,8 @@ public final class SongPlayerViewModel {
     private var hasStartedPlayback = false
     @ObservationIgnored
     private let onSongChange: ((Song) -> Void)?
+    @ObservationIgnored
+    private let localFileCache: LocalFileCaching
     
     private let timeFormatter: TimeFormatterProtocol
 
@@ -31,12 +34,14 @@ public final class SongPlayerViewModel {
         songs: [Song],
         startIndex: Int,
         onSongChange: ((Song) -> Void)? = nil,
+        localFileCache: LocalFileCaching = LocalFileCache.shared,
         playbackController: SongPlaybackControlling = AVSongPlaybackController(),
         timeFormatter: TimeFormatterProtocol = TimeFormatter()
     ) {
         self.songs = songs
         self.currentIndex = songs.isEmpty ? 0 : min(max(startIndex, 0), songs.count - 1)
         self.onSongChange = onSongChange
+        self.localFileCache = localFileCache
         self.playbackController = playbackController
         self.timeFormatter = timeFormatter
 
@@ -161,7 +166,12 @@ public final class SongPlayerViewModel {
 
         currentTime = 0
         duration = Double(song.trackTimeMillis) / 1000
-        playbackController.load(url: song.previewURL)
+        let playbackURL = localFileCache.resolvedURL(
+            for: song.previewURL,
+            key: String(song.trackID),
+            resourceType: .audio
+        )
+        playbackController.load(url: playbackURL)
 
         if autoplay {
             playbackController.play()

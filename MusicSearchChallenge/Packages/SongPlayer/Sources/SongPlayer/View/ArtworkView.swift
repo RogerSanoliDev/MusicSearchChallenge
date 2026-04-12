@@ -5,15 +5,21 @@
 //  Created by Roger dos Santos Oliveira on 10/04/26.
 //
 
+import Networking
 import SwiftUI
 
 struct ArtworkView: View {
+    private let localFileCache: LocalFileCaching
     private let url: URL?
-    
-    init(url: URL?) {
+
+    init(
+        url: URL?,
+        localFileCache: LocalFileCaching = LocalFileCache.shared
+    ) {
+        self.localFileCache = localFileCache
         self.url = url
     }
-    
+
     private var placeholderArtwork: some View {
         RoundedRectangle(cornerRadius: 28, style: .continuous)
             .fill(Color.secondary.opacity(0.15))
@@ -23,9 +29,9 @@ struct ArtworkView: View {
                     .foregroundStyle(.secondary)
             }
     }
-    
+
     var body: some View {
-        AsyncImage(url: url) { phase in
+        AsyncImage(url: resolvedImageURL) { phase in
             switch phase {
             case .success(let image):
                 image
@@ -43,6 +49,14 @@ struct ArtworkView: View {
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         .accessibilityHidden(true)
         .preferredColorScheme(.dark)
+    }
+
+    private var resolvedImageURL: URL? {
+        localFileCache.resolvedURL(
+            for: url,
+            key: nil,
+            resourceType: .image
+        )
     }
 }
 

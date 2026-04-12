@@ -5,9 +5,11 @@
 //  Created by Codex on 11/04/26.
 //
 
+import Networking
 import SwiftUI
 
 struct Thumbnail: View {
+    private let localFileCache: LocalFileCaching
     private let url: URL?
     private let size: CGFloat
     private let cornerRadius: CGFloat
@@ -17,8 +19,10 @@ struct Thumbnail: View {
         url: URL?,
         size: CGFloat,
         cornerRadius: CGFloat,
-        iconSize: CGFloat
+        iconSize: CGFloat,
+        localFileCache: LocalFileCaching = LocalFileCache.shared
     ) {
+        self.localFileCache = localFileCache
         self.url = url
         self.size = size
         self.cornerRadius = cornerRadius
@@ -26,7 +30,7 @@ struct Thumbnail: View {
     }
     
     var body: some View {
-        AsyncImage(url: url) { phase in
+        AsyncImage(url: resolvedImageURL) { phase in
             switch phase {
             case .success(let image):
                 image
@@ -42,6 +46,14 @@ struct Thumbnail: View {
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
         .accessibilityHidden(true)
         .preferredColorScheme(.dark)
+    }
+
+    private var resolvedImageURL: URL? {
+        localFileCache.resolvedURL(
+            for: url,
+            key: nil,
+            resourceType: .image
+        )
     }
     
     private var placeholderArtwork: some View {
