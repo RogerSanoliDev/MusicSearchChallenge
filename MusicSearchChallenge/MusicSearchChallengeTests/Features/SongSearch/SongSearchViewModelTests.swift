@@ -13,7 +13,7 @@ import SongPlayer
 @MainActor
 struct SongSearchViewModelTests {
     @Test
-    func init_withRecentPlayedSongs_setsRecentPlayedState() async throws {
+    func handleViewAppear_withRecentPlayedSongs_setsRecentPlayedState() async throws {
         let mock = SearchServiceMock()
         let recentSongs = [
             Song.stub(trackID: 1, artistName: "Queen", trackName: "Bohemian Rhapsody")
@@ -21,6 +21,7 @@ struct SongSearchViewModelTests {
         await mock.setFetchRecentPlayedHandler { recentSongs }
 
         let sut = SongSearchViewModel(searchService: mock)
+        sut.handleViewAppear()
 
         await assertEventually {
             sut.state == .recentPlayed
@@ -29,11 +30,12 @@ struct SongSearchViewModelTests {
     }
 
     @Test
-    func init_withoutRecentPlayedSongs_keepsIdleState() async throws {
+    func handleViewAppear_withoutRecentPlayedSongs_keepsIdleState() async throws {
         let mock = SearchServiceMock()
         await mock.setFetchRecentPlayedHandler { [] }
 
         let sut = SongSearchViewModel(searchService: mock)
+        sut.handleViewAppear()
 
         await assertEventually {
             sut.state == .idle
@@ -172,6 +174,80 @@ struct SongSearchViewModelTests {
                 && sut.state == .recentPlayed
                 && sut.songs.isEmpty
                 && sut.recentPlayedSongs.map(\.trackID) == [9]
+        }
+    }
+
+    @Test
+    func searchText_whenCleared_refreshesRecentPlayedSongs() async throws {
+        let mock = SearchServiceMock()
+        let firstRecentSongs = [
+            Song.stub(trackID: 1, artistName: "Artist", trackName: "Older Recent")
+        ]
+        let refreshedRecentSongs = [
+            Song.stub(trackID: 2, artistName: "Artist", trackName: "Newest Recent")
+        ]
+        await mock.enqueueFetchRecentPlayedResults([firstRecentSongs, refreshedRecentSongs])
+        await mock.setSearchHandler { _, _, _ in
+            [.stub(trackID: 99, artistName: "Artist", trackName: "Search Result")]
+        }
+
+        let sut = SongSearchViewModel(
+            searchService: mock,
+            searchDebounceDuration: .zero
+        )
+        sut.handleViewAppear()
+
+        await assertEventually {
+            sut.state == .recentPlayed
+                && sut.recentPlayedSongs == firstRecentSongs
+        }
+
+        sut.searchText = "query"
+
+        await assertEventually {
+            sut.state == .success
+                && sut.songs.map(\.trackID) == [99]
+        }
+
+        sut.searchText = ""
+
+        await assertEventually {
+            let fetchRecentPlayedCallCount = await mock.getFetchRecentPlayedCallCount()
+            return sut.state == .recentPlayed
+                && sut.recentPlayedSongs == refreshedRecentSongs
+                && fetchRecentPlayedCallCount == 2
+        }
+    }
+
+    @Test
+    func handleViewAppear_refreshesRecentPlayedSongs() async throws {
+        let mock = SearchServiceMock()
+        let firstRecentSongs = [
+            Song.stub(trackID: 1, artistName: "Artist", trackName: "Older Recent")
+        ]
+        let refreshedRecentSongs = [
+            Song.stub(trackID: 2, artistName: "Artist", trackName: "Newest Recent")
+        ]
+        await mock.enqueueFetchRecentPlayedResults([firstRecentSongs, refreshedRecentSongs])
+
+        let sut = SongSearchViewModel(
+            searchService: mock,
+            searchDebounceDuration: .zero
+        )
+        sut.handleViewAppear()
+
+        await assertEventually {
+            sut.state == .recentPlayed
+                && sut.recentPlayedSongs == firstRecentSongs
+        }
+
+        sut.searchText = "query"
+        sut.handleViewAppear()
+
+        await assertEventually {
+            let fetchRecentPlayedCallCount = await mock.getFetchRecentPlayedCallCount()
+            return sut.recentPlayedSongs == refreshedRecentSongs
+                && fetchRecentPlayedCallCount == 2
         }
     }
 
@@ -380,14 +456,14 @@ struct SongSearchViewModelTests {
     }
 
     @Test
-    func didSelectSong_returnsSelectedSongWithoutSavingRecentPlayed() async throws {
+    func currentSong_returnsSelectedSongWithoutSavingRecentPlayed() async throws {
         let mock = SearchServiceMock()
         await mock.setFetchRecentPlayedHandler { [] }
         let sut = SongSearchViewModel(searchService: mock)
         sut.state = .success
         sut.songs = [.stub(trackID: 42, artistName: "Muse", trackName: "Hysteria")]
 
-        let selectedSong = sut.didSelectSong(at: 0)
+        let selectedSong = sut.currentSong(at: 0)
 
         #expect(selectedSong?.trackID == 42)
         #expect(await mock.saveRecentPlayedCalls.isEmpty)

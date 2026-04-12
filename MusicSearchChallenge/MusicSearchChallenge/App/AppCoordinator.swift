@@ -108,6 +108,7 @@ final class AppCoordinator {
                 startIndex: context.startIndex,
                 onMoreOptionsSelected: showMoreOptions(for:)
             )
+            .id(context.id)
         case .album(let song):
             AlbumView(
                 song: song,
