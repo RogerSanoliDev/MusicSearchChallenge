@@ -1,4 +1,5 @@
 import Foundation
+import Networking
 import Testing
 @testable import SongPlayer
 
@@ -7,9 +8,11 @@ struct SongPlayerViewModelTests {
     @Test
     func onAppear_loadsStartSong_andStartsPlayback() {
         let playbackController = MockSongPlaybackController()
+        let localFileCache = MockLocalFileCache()
         let sut = SongPlayerViewModel(
             songs: [.stub(trackID: 1, trackName: "Pull Me Under"), .stub(trackID: 2, trackName: "6:00", previewURL: URL(string: "https://example.com/preview.m4a"))],
             startIndex: 1,
+            localFileCache: localFileCache,
             playbackController: playbackController
         )
 
@@ -20,8 +23,26 @@ struct SongPlayerViewModelTests {
             return
         }
         #expect(playbackController.loadedURLs == [expectedURL])
+        #expect(localFileCache.requestedKeys == ["2"])
         #expect(playbackController.playCallCount == 1)
         #expect(sut.currentSong?.trackName == "6:00")
+    }
+
+    @Test
+    func onAppear_prefersCachedLocalURL_whenAvailable() {
+        let playbackController = MockSongPlaybackController()
+        let localURL = URL(fileURLWithPath: "/tmp/cached-song.m4a")
+        let localFileCache = MockLocalFileCache(cachedResolvedURL: localURL)
+        let sut = SongPlayerViewModel(
+            songs: [.stub(trackID: 9, previewURL: URL(string: "https://example.com/preview.m4a"))],
+            startIndex: 0,
+            localFileCache: localFileCache,
+            playbackController: playbackController
+        )
+
+        sut.onAppear()
+
+        #expect(playbackController.loadedURLs == [localURL])
     }
 
     @Test
@@ -30,6 +51,7 @@ struct SongPlayerViewModelTests {
         let sut = SongPlayerViewModel(
             songs: [.stub(trackID: 1, trackName: "Pull Me Under"), .stub(trackID: 2, trackName: "6:00")],
             startIndex: 1,
+            localFileCache: MockLocalFileCache(),
             playbackController: playbackController
         )
         sut.onAppear()
@@ -47,6 +69,7 @@ struct SongPlayerViewModelTests {
         let sut = SongPlayerViewModel(
             songs: [.stub(trackID: 1, trackName: "Pull Me Under")],
             startIndex: 0,
+            localFileCache: MockLocalFileCache(),
             playbackController: playbackController
         )
         sut.onAppear()
@@ -64,6 +87,7 @@ struct SongPlayerViewModelTests {
         let sut = SongPlayerViewModel(
             songs: [.stub(trackID: 1, trackName: "Pull Me Under")],
             startIndex: 0,
+            localFileCache: MockLocalFileCache(),
             playbackController: playbackController
         )
         sut.onAppear()
@@ -80,6 +104,7 @@ struct SongPlayerViewModelTests {
         let sut = SongPlayerViewModel(
             songs: [.stub(trackID: 1, trackName: "Pull Me Under"), .stub(trackID: 2, trackName: "6:00")],
             startIndex: 1,
+            localFileCache: MockLocalFileCache(),
             playbackController: playbackController
         )
         sut.onAppear()
@@ -103,6 +128,7 @@ struct SongPlayerViewModelTests {
             songs: songs,
             startIndex: 0,
             onSongChange: { changedSongs.append($0) },
+            localFileCache: MockLocalFileCache(),
             playbackController: playbackController
         )
 
@@ -124,6 +150,7 @@ struct SongPlayerViewModelTests {
             songs: songs,
             startIndex: 0,
             onSongChange: { changedSongs.append($0) },
+            localFileCache: MockLocalFileCache(),
             playbackController: playbackController
         )
 

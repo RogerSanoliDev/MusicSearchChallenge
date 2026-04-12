@@ -8,6 +8,7 @@
 import AVFoundation
 import Foundation
 
+@MainActor
 public protocol AVPlayerProtocol: AnyObject {
     var rate: Float { get }
     var currentItem: AVPlayerItem? { get }
@@ -30,4 +31,5 @@ public protocol AVPlayerProtocol: AnyObject {
     )
 }
 
+@MainActor
 extension AVPlayer: AVPlayerProtocol {}
