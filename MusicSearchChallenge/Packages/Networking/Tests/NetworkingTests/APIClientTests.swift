@@ -142,6 +142,76 @@ struct APIClientTests {
 
         #expect(await callCounter.count == 2)
     }
+
+    @Test
+    func performRequest_whenRequestFails_retriesUntilSuccess() async throws {
+        let session = SequencedMockURLSession(
+            responses: [
+                .failure(NetworkError.invalidStatusCode(errorCode: 500)),
+                .failure(URLError(.timedOut)),
+                .success((MockResponse.stub(id: 8).toData(), .stub()))
+            ]
+        )
+        let sut = APIClient(
+            requestDeduplicator: InFlightRequestDeduplicator(),
+            retryStrategy: RequestRetryStrategy(maxRetryCount: 5),
+            sleep: { _ in }
+        )
+
+        let result: MockResponse = try await sut.performRequest(
+            endpoint: endpoint,
+            session: session
+        )
+
+        #expect(result == MockResponse(id: 8, name: "Name"))
+        #expect(await session.callCount == 3)
+    }
+
+    @Test
+    func performRequest_whenFailuresExceedRetryLimit_throwsLastError() async {
+        let session = SequencedMockURLSession(
+            responses: [
+                .failure(NetworkError.invalidStatusCode(errorCode: 503)),
+                .failure(NetworkError.invalidStatusCode(errorCode: 503)),
+                .failure(NetworkError.invalidStatusCode(errorCode: 503))
+            ]
+        )
+        let sut = APIClient(
+            requestDeduplicator: InFlightRequestDeduplicator(),
+            retryStrategy: RequestRetryStrategy(maxRetryCount: 2),
+            sleep: { _ in }
+        )
+
+        await #expect(throws: NetworkError.invalidStatusCode(errorCode: 503)) {
+            let _: MockResponse = try await sut.performRequest(
+                endpoint: endpoint,
+                session: session
+            )
+        }
+
+        #expect(await session.callCount == 3)
+    }
+
+    @Test
+    func performRequest_whenFailureIsNotRetryable_doesNotRetry() async {
+        let session = SequencedMockURLSession(
+            responses: [.failure(NetworkError.invalidStatusCode(errorCode: 404))]
+        )
+        let sut = APIClient(
+            requestDeduplicator: InFlightRequestDeduplicator(),
+            retryStrategy: RequestRetryStrategy(maxRetryCount: 5),
+            sleep: { _ in }
+        )
+
+        await #expect(throws: NetworkError.invalidStatusCode(errorCode: 404)) {
+            let _: MockResponse = try await sut.performRequest(
+                endpoint: endpoint,
+                session: session
+            )
+        }
+
+        #expect(await session.callCount == 1)
+    }
 //    
 //    // MARK: - Session Error
 //    
