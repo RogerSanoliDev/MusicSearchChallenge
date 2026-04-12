@@ -9,6 +9,7 @@ import Foundation
 import Observation
 import SongPlayer
 
+@MainActor
 @Observable
 final class AlbumViewModel {
     enum State: Equatable {
@@ -34,7 +35,6 @@ final class AlbumViewModel {
         self.searchService = searchService
     }
 
-    @MainActor
     func fetchAlbum() async {
         guard !hasLoaded else { return }
 

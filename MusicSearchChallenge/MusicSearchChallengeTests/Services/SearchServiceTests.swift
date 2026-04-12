@@ -15,7 +15,7 @@ struct SearchServiceTests {
     @MainActor
     func search_callsRepository_withCorrectParameters_andMapsResponse() async throws {
         let mock = APISearchRepositoryMock()
-        let sut = SearchService(apiRepository: mock)
+        let sut = makeSUT(apiRepository: mock)
         await mock.setSearchResult(.success(
             SearchResponseDTO(
                 results: [
@@ -49,7 +49,7 @@ struct SearchServiceTests {
     @MainActor
     func search_propagatesRepositoryError() async {
         let mock = APISearchRepositoryMock()
-        let sut = SearchService(apiRepository: mock)
+        let sut = makeSUT(apiRepository: mock)
         await mock.setSearchResult(.failure(NetworkError.invalidStatusCode(errorCode: 500)))
 
         await #expect(throws: NetworkError.self) {
@@ -61,7 +61,7 @@ struct SearchServiceTests {
     @MainActor
     func fetchAlbum_callsRepository_withCorrectParameters_andMapsResponse() async throws {
         let mock = APISearchRepositoryMock()
-        let sut = SearchService(apiRepository: mock)
+        let sut = makeSUT(apiRepository: mock)
         await mock.setFetchAlbumResult(.success(
             AlbumResponseDTO(
                 songs: [
@@ -94,11 +94,54 @@ struct SearchServiceTests {
     @MainActor
     func fetchAlbum_propagatesRepositoryError() async {
         let mock = APISearchRepositoryMock()
-        let sut = SearchService(apiRepository: mock)
+        let sut = makeSUT(apiRepository: mock)
         await mock.setFetchAlbumResult(.failure(NetworkError.invalidHTTPResponse))
 
         await #expect(throws: NetworkError.self) {
             try await sut.fetchAlbum(collectionId: 123)
         }
+    }
+
+    @Test
+    @MainActor
+    func saveRecentPlayed_callsLocalStorageRepositoryWithSong() async throws {
+        let localStorageRepository = LocalStorageRepositoryMock()
+        let sut = makeSUT(localStorageRepository: localStorageRepository)
+        let song = Song.stub(trackID: 123, trackName: "One More Time")
+
+        try await sut.saveRecentPlayed(song: song)
+
+        #expect(localStorageRepository.savedRecentPlayedSongs == [song])
+    }
+
+    @Test
+    @MainActor
+    func fetchRecentPlayed_returnsSongsFromLocalStorageRepository() async throws {
+        let localStorageRepository = LocalStorageRepositoryMock()
+        let sut = makeSUT(localStorageRepository: localStorageRepository)
+        let expectedSongs = [
+            Song.stub(trackID: 1, trackName: "First"),
+            Song.stub(trackID: 2, trackName: "Second")
+        ]
+        localStorageRepository.recentPlayedResult = .success(expectedSongs)
+
+        let result = try await sut.fetchRecentPlayed()
+
+        #expect(result == expectedSongs)
+    }
+
+    @MainActor
+    private func makeSUT(
+        apiRepository: APISearchRepositoryProtocol = APISearchRepositoryMock(),
+        localStorageRepository: LocalStorageRepositoryMock? = nil
+    ) -> SearchService {
+        let localStorageRepository = localStorageRepository ?? LocalStorageRepositoryMock()
+
+        return SearchService(
+            apiRepository: apiRepository,
+            localStorageRepositoryProvider: {
+                localStorageRepository
+            }
+        )
     }
 }

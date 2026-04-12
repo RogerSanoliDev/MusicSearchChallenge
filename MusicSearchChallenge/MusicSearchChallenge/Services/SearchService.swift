@@ -10,13 +10,22 @@ import SongPlayer
 protocol SearchServiceProtocol: Sendable {
     nonisolated func search(term: String, limit: Int, offset: Int) async throws -> [Song]
     nonisolated func fetchAlbum(collectionId: Int) async throws -> [Song]
+    nonisolated func saveRecentPlayed(song: Song) async throws
+    nonisolated func fetchRecentPlayed() async throws -> [Song]
 }
 
 final class SearchService: SearchServiceProtocol {
     private let apiRepository: APISearchRepositoryProtocol
+    private let localStorageRepositoryProvider: @Sendable @MainActor () -> any LocalStorageRepositoryProtocol
     
-    nonisolated init(apiRepository: APISearchRepositoryProtocol = APISearchRepository()) {
+    nonisolated init(
+        apiRepository: APISearchRepositoryProtocol = APISearchRepository(),
+        localStorageRepositoryProvider: @escaping @Sendable @MainActor () -> any LocalStorageRepositoryProtocol = {
+            LocalStorageRepositoryFactory.makeDefaultRepository()
+        }
+    ) {
         self.apiRepository = apiRepository
+        self.localStorageRepositoryProvider = localStorageRepositoryProvider
     }
     
     nonisolated func search(term: String, limit: Int, offset: Int) async throws -> [Song] {
@@ -40,5 +49,19 @@ final class SearchService: SearchServiceProtocol {
     nonisolated func fetchAlbum(collectionId: Int) async throws -> [Song] {
         let albumResponse = try await apiRepository.fetchAlbum(collectionId: collectionId)
         return albumResponse.songs.map { Song(dto: $0) }
+    }
+
+    nonisolated func saveRecentPlayed(song: Song) async throws {
+        try await MainActor.run {
+            let repository = localStorageRepositoryProvider()
+            try repository.saveRecentPlayed(song: song)
+        }
+    }
+
+    nonisolated func fetchRecentPlayed() async throws -> [Song] {
+        try await MainActor.run {
+            let repository = localStorageRepositoryProvider()
+            return try repository.fetchRecentPlayed()
+        }
     }
 }

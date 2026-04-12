@@ -10,6 +10,7 @@ import SongPlayer
 
 struct SongListView: View {
     let songs: [Song]
+    private let sectionTitle: String?
     private let isPlaylist: Bool
     private let showsPaginationLoader: Bool
     private let onSongSelected: (Int) -> Void
@@ -18,6 +19,7 @@ struct SongListView: View {
     
     init(
         songs: [Song],
+        sectionTitle: String? = nil,
         isPlaylist: Bool = false,
         showsPaginationLoader: Bool = true,
         onSongSelected: @escaping (Int) -> Void = { _ in },
@@ -25,6 +27,7 @@ struct SongListView: View {
         onReachedBottom: (() -> Void)? = nil
     ) {
         self.songs = songs
+        self.sectionTitle = sectionTitle
         self.isPlaylist = isPlaylist
         self.showsPaginationLoader = showsPaginationLoader
         self.onSongSelected = onSongSelected
@@ -35,6 +38,16 @@ struct SongListView: View {
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 0) {
+                if let sectionTitle {
+                    Text(sectionTitle)
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 16)
+                        .padding(.top, 12)
+                        .padding(.bottom, 4)
+                }
+
                 ForEach(Array(songs.enumerated()), id: \.element.trackID) { index, song in
                     SongCell(
                         song: song,

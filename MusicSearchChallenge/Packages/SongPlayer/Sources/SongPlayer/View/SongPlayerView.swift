@@ -13,12 +13,14 @@ public struct SongPlayerView: View {
     public init(
         songs: [Song],
         startIndex: Int,
+        onSongChange: ((Song) -> Void)? = nil,
         playbackController: SongPlaybackControlling = AVSongPlaybackController()
     ) {
         _viewModel = State(
             initialValue: SongPlayerViewModel(
                 songs: songs,
                 startIndex: startIndex,
+                onSongChange: onSongChange,
                 playbackController: playbackController
             )
         )

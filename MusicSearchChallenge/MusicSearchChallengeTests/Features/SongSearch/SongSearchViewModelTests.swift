@@ -13,8 +13,38 @@ import SongPlayer
 @MainActor
 struct SongSearchViewModelTests {
     @Test
+    func init_withRecentPlayedSongs_setsRecentPlayedState() async throws {
+        let mock = SearchServiceMock()
+        let recentSongs = [
+            Song.stub(trackID: 1, artistName: "Queen", trackName: "Bohemian Rhapsody")
+        ]
+        await mock.setFetchRecentPlayedHandler { recentSongs }
+
+        let sut = SongSearchViewModel(searchService: mock)
+
+        await assertEventually {
+            sut.state == .recentPlayed
+                && sut.recentPlayedSongs == recentSongs
+        }
+    }
+
+    @Test
+    func init_withoutRecentPlayedSongs_keepsIdleState() async throws {
+        let mock = SearchServiceMock()
+        await mock.setFetchRecentPlayedHandler { [] }
+
+        let sut = SongSearchViewModel(searchService: mock)
+
+        await assertEventually {
+            sut.state == .idle
+                && sut.recentPlayedSongs.isEmpty
+        }
+    }
+
+    @Test
     func searchText_performsSearchAfterDebounce_andUpdatesSuccessState() async throws {
         let mock = SearchServiceMock()
+        await mock.setFetchRecentPlayedHandler { [] }
         await mock.setSearchHandler { term, limit, offset in
             #expect(term == "queen")
             #expect(limit == 10)
@@ -45,6 +75,7 @@ struct SongSearchViewModelTests {
     @Test
     func searchText_withEmptyResults_setsEmptyState() async throws {
         let mock = SearchServiceMock()
+        await mock.setFetchRecentPlayedHandler { [] }
         await mock.setSearchHandler { _, _, _ in [] }
 
         let sut = SongSearchViewModel(
@@ -66,6 +97,7 @@ struct SongSearchViewModelTests {
         }
 
         let mock = SearchServiceMock()
+        await mock.setFetchRecentPlayedHandler { [] }
         await mock.setSearchHandler { _, _, _ in
             throw SearchError.failed
         }
@@ -85,6 +117,7 @@ struct SongSearchViewModelTests {
     @Test
     func searchText_whenChangedDuringInFlightRequest_cancelsPreviousTask() async throws {
         let mock = SearchServiceMock()
+        await mock.setFetchRecentPlayedHandler { [] }
         await mock.setSearchHandler { term, _, _ in
             if term == "beatles" {
                 try await Task.sleep(for: .seconds(2))
@@ -116,8 +149,11 @@ struct SongSearchViewModelTests {
     }
 
     @Test
-    func searchText_whenCleared_resetsToIdleWithoutSearching() async throws {
+    func searchText_whenCleared_restoresRecentPlayedStateWithoutSearching() async throws {
         let mock = SearchServiceMock()
+        await mock.setFetchRecentPlayedHandler {
+            [.stub(trackID: 9, artistName: "Artist", trackName: "Recent Song")]
+        }
         await mock.setSearchHandler { _, _, _ in
             [.stub(trackID: 1, artistName: "Artist", trackName: "Song")]
         }
@@ -133,14 +169,16 @@ struct SongSearchViewModelTests {
 
         await assertEventually {
             await mock.searchCalls.isEmpty
-                && sut.state == .idle
+                && sut.state == .recentPlayed
                 && sut.songs.isEmpty
+                && sut.recentPlayedSongs.map(\.trackID) == [9]
         }
     }
 
     @Test
     func loadNextPageIfNeeded_appendsSongsAndUpdatesOffset() async throws {
         let mock = SearchServiceMock()
+        await mock.setFetchRecentPlayedHandler { [] }
         await mock.setSearchHandler { term, limit, offset in
             #expect(term == "queen")
             #expect(limit == 10)
@@ -186,6 +224,7 @@ struct SongSearchViewModelTests {
     @Test
     func loadNextPageIfNeeded_whenNextPageAddsUniqueSongs_keepsPaginationEnabled() async throws {
         let mock = SearchServiceMock()
+        await mock.setFetchRecentPlayedHandler { [] }
         await mock.setSearchHandler { _, _, offset in
             if offset == 0 {
                 return (1...10).map {
@@ -224,6 +263,7 @@ struct SongSearchViewModelTests {
     @Test
     func loadNextPageIfNeeded_whenNextPageOnlyContainsDuplicates_stopsPagination() async throws {
         let mock = SearchServiceMock()
+        await mock.setFetchRecentPlayedHandler { [] }
         await mock.setSearchHandler { _, _, offset in
             if offset == 0 {
                 return (1...10).map {
@@ -261,6 +301,7 @@ struct SongSearchViewModelTests {
     @Test
     func reloadSearch_afterPagination_reloadsFirstPageAndResetsResults() async throws {
         let mock = SearchServiceMock()
+        await mock.setFetchRecentPlayedHandler { [] }
         await mock.setSearchHandler { _, _, offset in
             switch offset {
             case 0:
@@ -314,6 +355,7 @@ struct SongSearchViewModelTests {
     @Test
     func reloadSearch_withBlankQuery_resetsToIdleWithoutRequest() async throws {
         let mock = SearchServiceMock()
+        await mock.setFetchRecentPlayedHandler { [] }
         await mock.setSearchHandler { _, _, _ in
             [.stub(trackID: 1, artistName: "Queen", trackName: "Bohemian Rhapsody")]
         }
@@ -335,6 +377,20 @@ struct SongSearchViewModelTests {
         #expect(sut.songs.isEmpty)
         #expect(sut.hasMorePages == false)
         #expect(sut.isLoadingNextPage == false)
+    }
+
+    @Test
+    func didSelectSong_returnsSelectedSongWithoutSavingRecentPlayed() async throws {
+        let mock = SearchServiceMock()
+        await mock.setFetchRecentPlayedHandler { [] }
+        let sut = SongSearchViewModel(searchService: mock)
+        sut.state = .success
+        sut.songs = [.stub(trackID: 42, artistName: "Muse", trackName: "Hysteria")]
+
+        let selectedSong = sut.didSelectSong(at: 0)
+
+        #expect(selectedSong?.trackID == 42)
+        #expect(await mock.saveRecentPlayedCalls.isEmpty)
     }
 
     @MainActor

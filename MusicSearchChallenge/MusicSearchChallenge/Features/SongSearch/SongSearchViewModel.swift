@@ -9,11 +9,12 @@ import Foundation
 import Observation
 import SongPlayer
 
+@MainActor
 @Observable
 final class SongSearchViewModel {
     enum State {
         case idle
-        case recent
+        case recentPlayed
         case loading
         case success
         case error
@@ -27,6 +28,7 @@ final class SongSearchViewModel {
     }
     var state: State = .idle
     var songs: [Song] = []
+    var recentPlayedSongs: [Song] = []
     var isLoadingNextPage = false
     var hasMorePages = false
     
@@ -51,6 +53,10 @@ final class SongSearchViewModel {
         self.searchService = searchService
         self.searchDebounceDuration = searchDebounceDuration
         self.searchLimit = searchLimit
+
+        Task { [weak self] in
+            await self?.loadRecentPlayed()
+        }
     }
 
     deinit {
@@ -64,7 +70,7 @@ final class SongSearchViewModel {
 
         let trimmedSearchText = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedSearchText.isEmpty else {
-            state = .idle
+            restoreInitialState()
             songs = []
             isLoadingNextPage = false
             hasMorePages = false
@@ -102,7 +108,7 @@ final class SongSearchViewModel {
 
         let trimmedSearchText = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedSearchText.isEmpty else {
-            state = .idle
+            restoreInitialState()
             songs = []
             isLoadingNextPage = false
             hasMorePages = false
@@ -166,6 +172,51 @@ final class SongSearchViewModel {
         paginationTask = Task { [weak self] in
             guard let self else { return }
             await self.searchPage(for: trimmedSearchText, offset: nextOffset)
+        }
+    }
+
+    func didSelectSong(at index: Int) -> Song? {
+        let availableSongs: [Song]
+
+        switch state {
+        case .recentPlayed:
+            availableSongs = recentPlayedSongs
+        case .success:
+            availableSongs = songs
+        default:
+            return nil
+        }
+
+        guard availableSongs.indices.contains(index) else { return nil }
+        return availableSongs[index]
+    }
+
+    private func loadRecentPlayed() async {
+        do {
+            let recentPlayedSongs = try await searchService.fetchRecentPlayed()
+            guard !Task.isCancelled else { return }
+
+            self.recentPlayedSongs = recentPlayedSongs
+
+            if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                restoreInitialState()
+            }
+        } catch {
+            guard !Task.isCancelled else { return }
+            recentPlayedSongs = []
+
+            if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                restoreInitialState()
+            }
+        }
+    }
+
+    private func restoreInitialState() {
+        state = recentPlayedSongs.isEmpty ? .idle : .recentPlayed
+        if state == .recentPlayed {
+            Task { [weak self] in
+                await self?.loadRecentPlayed()
+            }
         }
     }
 }

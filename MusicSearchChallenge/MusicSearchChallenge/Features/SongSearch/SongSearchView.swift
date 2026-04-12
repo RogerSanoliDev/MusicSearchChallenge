@@ -48,8 +48,17 @@ struct SongSearchView: View {
                 systemImageName: "magnifyingglass",
                 message: String(localized: "search.idle.message")
             )
-        case .recent:
-            Text("recent")
+        case .recentPlayed:
+            SongListView(
+                songs: viewModel.recentPlayedSongs,
+                sectionTitle: "Recently Played",
+                showsPaginationLoader: false,
+                onSongSelected: { index in
+                    guard let song = viewModel.didSelectSong(at: index) else { return }
+                    onSongSelected(song)
+                },
+                onMoreOptionsSelected: onMoreOptionsSelected
+            )
         case .loading:
             List(0..<10, id: \.self) { _ in
                 SongCellLoadingView()
@@ -67,7 +76,8 @@ struct SongSearchView: View {
                 songs: viewModel.songs,
                 showsPaginationLoader: viewModel.hasMorePages,
                 onSongSelected: { index in
-                    onSongSelected(viewModel.songs[index])
+                    guard let song = viewModel.didSelectSong(at: index) else { return }
+                    onSongSelected(song)
                 },
                 onMoreOptionsSelected: onMoreOptionsSelected,
                 onReachedBottom: {

@@ -67,6 +67,24 @@ struct SongSearchViewTests {
     }
 
     @Test(.snapshots(record: .missing))
+    func songSearchView_recentPlayed_matchesSnapshot() {
+        let viewModel = SongSearchViewModel()
+        viewModel.state = .recentPlayed
+        viewModel.recentPlayedSongs = [
+            .stub(trackID: 1, artistName: "Dream Theater", collectionName: "Images and Words", trackName: "Pull Me Under"),
+            .stub(trackID: 2, artistName: "Dream Theater", collectionName: "Awake", trackName: "6:00"),
+            .stub(trackID: 3, artistName: "Dream Theater", collectionName: "Octavarium", trackName: "Panic Attack"),
+        ]
+
+        assertSnapshot(
+            of: NavigationStack {
+                SongSearchView(viewModel: viewModel)
+            },
+            as: .image(layout: .device(config: .iPhone13))
+        )
+    }
+
+    @Test(.snapshots(record: .missing))
     func songSearchView_success_matchesSnapshot() {
         let viewModel = SongSearchViewModel()
         viewModel.state = .success
