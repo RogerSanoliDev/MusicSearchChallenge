@@ -90,4 +90,47 @@ struct SongPlayerViewModelTests {
         #expect(sut.currentSong?.trackName == "Pull Me Under")
         #expect(playbackController.playCallCount == 2)
     }
+
+    @Test
+    func playNext_notifiesOnSongChangeWithNewCurrentSong() {
+        let playbackController = MockSongPlaybackController()
+        var changedSongs: [Song] = []
+        let songs = [
+            Song.stub(trackID: 1, trackName: "Pull Me Under"),
+            Song.stub(trackID: 2, trackName: "6:00")
+        ]
+        let sut = SongPlayerViewModel(
+            songs: songs,
+            startIndex: 0,
+            onSongChange: { changedSongs.append($0) },
+            playbackController: playbackController
+        )
+
+        sut.onAppear()
+        sut.playNext()
+
+        #expect(changedSongs == [songs[1]])
+    }
+
+    @Test
+    func playbackFinished_notifiesOnSongChangeWhenAdvancingToNextSong() {
+        let playbackController = MockSongPlaybackController()
+        var changedSongs: [Song] = []
+        let songs = [
+            Song.stub(trackID: 1, trackName: "Pull Me Under"),
+            Song.stub(trackID: 2, trackName: "6:00")
+        ]
+        let sut = SongPlayerViewModel(
+            songs: songs,
+            startIndex: 0,
+            onSongChange: { changedSongs.append($0) },
+            playbackController: playbackController
+        )
+
+        sut.onAppear()
+        playbackController.finishCurrentItem()
+
+        #expect(changedSongs == [songs[1]])
+        #expect(sut.currentSong?.trackName == "6:00")
+    }
 }

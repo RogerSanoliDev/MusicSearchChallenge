@@ -9,38 +9,37 @@ import SwiftUI
 import SongPlayer
 
 struct SongPlayerContainerView: View {
-    private let songs: [Song]
-    private let startIndex: Int
+    @State private var viewModel: SongPlayerContainerViewModel
     private let onMoreOptionsSelected: (Song) -> Void
-    
-    private var playerViewID: String {
-        let trackIDs = songs.map(\.trackID).map(String.init).joined(separator: "-")
-        return "\(trackIDs)-\(startIndex)"
-    }
-
-    private var selectedSong: Song? {
-        guard songs.indices.contains(startIndex) else { return songs.first }
-        return songs[startIndex]
-    }
 
     init(
         songs: [Song],
         startIndex: Int,
         onMoreOptionsSelected: @escaping (Song) -> Void = { _ in }
     ) {
-        self.songs = songs
-        self.startIndex = startIndex
+        _viewModel = State(initialValue: SongPlayerContainerViewModel(
+            songs: songs,
+            startIndex: startIndex
+        ))
         self.onMoreOptionsSelected = onMoreOptionsSelected
     }
 
     var body: some View {
         SongPlayerView(
-            songs: songs,
-            startIndex: startIndex
+            songs: viewModel.songs,
+            startIndex: viewModel.startIndex,
+            onSongChange: { song in
+                Task {
+                    await viewModel.handleSongChange(song)
+                }
+            }
         )
-        .id(playerViewID)
+        .id(viewModel.playerViewID)
+        .task {
+            await viewModel.onAppear()
+        }
         .toolbar {
-            if let selectedSong {
+            if let selectedSong = viewModel.selectedSong {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         onMoreOptionsSelected(selectedSong)

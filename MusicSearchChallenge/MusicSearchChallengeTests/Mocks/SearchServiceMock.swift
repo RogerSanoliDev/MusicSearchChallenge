@@ -20,10 +20,16 @@ actor SearchServiceMock: SearchServiceProtocol {
         let collectionId: Int
     }
 
+    struct SaveRecentPlayedCall: Equatable {
+        let song: Song
+    }
+
     var searchCalls: [SearchCall] = []
     var fetchAlbumCalls: [FetchAlbumCall] = []
+    var saveRecentPlayedCalls: [SaveRecentPlayedCall] = []
     var searchHandler: (@Sendable (String, Int, Int) async throws -> [Song])?
     var fetchAlbumHandler: (@Sendable (Int) async throws -> [Song])?
+    var fetchRecentPlayedHandler: (@Sendable () async throws -> [Song])?
 
     func setSearchHandler(
         _ handler: @escaping @Sendable (String, Int, Int) async throws -> [Song]
@@ -35,6 +41,12 @@ actor SearchServiceMock: SearchServiceProtocol {
         _ handler: @escaping @Sendable (Int) async throws -> [Song]
     ) {
         fetchAlbumHandler = handler
+    }
+
+    func setFetchRecentPlayedHandler(
+        _ handler: @escaping @Sendable () async throws -> [Song]
+    ) {
+        fetchRecentPlayedHandler = handler
     }
 
     func search(term: String, limit: Int, offset: Int) async throws -> [Song] {
@@ -55,5 +67,17 @@ actor SearchServiceMock: SearchServiceProtocol {
         }
 
         return try await fetchAlbumHandler(collectionId)
+    }
+
+    func saveRecentPlayed(song: Song) async throws {
+        saveRecentPlayedCalls.append(SaveRecentPlayedCall(song: song))
+    }
+
+    func fetchRecentPlayed() async throws -> [Song] {
+        guard let fetchRecentPlayedHandler else {
+            fatalError("fetchRecentPlayedHandler not set on SearchServiceMock")
+        }
+
+        return try await fetchRecentPlayedHandler()
     }
 }

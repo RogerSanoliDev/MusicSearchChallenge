@@ -22,17 +22,21 @@ public final class SongPlayerViewModel {
     private let playbackController: SongPlaybackControlling
     @ObservationIgnored
     private var hasStartedPlayback = false
+    @ObservationIgnored
+    private let onSongChange: ((Song) -> Void)?
     
     private let timeFormatter: TimeFormatterProtocol
 
     public init(
         songs: [Song],
         startIndex: Int,
+        onSongChange: ((Song) -> Void)? = nil,
         playbackController: SongPlaybackControlling = AVSongPlaybackController(),
         timeFormatter: TimeFormatterProtocol = TimeFormatter()
     ) {
         self.songs = songs
         self.currentIndex = songs.isEmpty ? 0 : min(max(startIndex, 0), songs.count - 1)
+        self.onSongChange = onSongChange
         self.playbackController = playbackController
         self.timeFormatter = timeFormatter
 
@@ -104,6 +108,7 @@ public final class SongPlayerViewModel {
 
         if currentTime < 2, currentIndex > 0 {
             currentIndex -= 1
+            notifySongChange()
             loadCurrentSong(autoplay: true)
             return
         }
@@ -119,6 +124,7 @@ public final class SongPlayerViewModel {
         guard canPlayNext else { return }
 
         currentIndex += 1
+        notifySongChange()
         loadCurrentSong(autoplay: true)
     }
 
@@ -167,12 +173,14 @@ public final class SongPlayerViewModel {
     private func handlePlaybackFinished() {
         if canPlayNext {
             currentIndex += 1
+            notifySongChange()
             loadCurrentSong(autoplay: true)
             return
         }
 
         if isRepeating, !songs.isEmpty {
             currentIndex = 0
+            notifySongChange()
             loadCurrentSong(autoplay: true)
             return
         }
@@ -181,5 +189,10 @@ public final class SongPlayerViewModel {
         isPlaying = false
         playbackController.pause()
         playbackController.seek(to: 0)
+    }
+
+    private func notifySongChange() {
+        guard let currentSong else { return }
+        onSongChange?(currentSong)
     }
 }

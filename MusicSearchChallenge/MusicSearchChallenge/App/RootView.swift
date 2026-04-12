@@ -40,5 +40,5 @@ struct RootView: View {
 
 #Preview {
     RootView()
-        .modelContainer(for: Item.self, inMemory: true)
+        .modelContainer(for: StoredSong.self, inMemory: true)
 }
