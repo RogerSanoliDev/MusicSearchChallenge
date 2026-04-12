@@ -13,14 +13,14 @@ import SongPlayer
 @MainActor
 struct LocalStorageRepositoryTests {
     @Test
-    func save_persistsSearchedSong_andDoesNotAddItToRecentPlayed() throws {
+    func save_persistsSearchedSong_andDoesNotAddItToRecentPlayed() async throws {
         let sut = try makeSUT()
         let song = Song.stub(trackID: 1, artistName: "Queen", trackName: "Bohemian Rhapsody")
 
-        try sut.save(song: song)
+        try await sut.save(song: song)
 
-        let foundSongs = try sut.searchSongs(term: "bohemian", limit: 10, offset: 0)
-        let recentSongs = try sut.fetchRecentPlayed()
+        let foundSongs = try await sut.searchSongs(term: "bohemian", limit: 10, offset: 0)
+        let recentSongs = try await sut.fetchRecentPlayed()
 
         #expect(foundSongs.count == 1)
         #expect(foundSongs.first == song)
@@ -28,30 +28,30 @@ struct LocalStorageRepositoryTests {
     }
 
     @Test
-    func saveRecentPlayed_persistsSong_andReturnsItInRecents() throws {
+    func saveRecentPlayed_persistsSong_andReturnsItInRecents() async throws {
         let sut = try makeSUT()
         let song = Song.stub(trackID: 1, artistName: "Queen", trackName: "Bohemian Rhapsody")
 
-        try sut.saveRecentPlayed(song: song)
+        try await sut.saveRecentPlayed(song: song)
 
-        let recentSongs = try sut.fetchRecentPlayed()
+        let recentSongs = try await sut.fetchRecentPlayed()
 
         #expect(recentSongs.count == 1)
         #expect(recentSongs.first == song)
     }
 
     @Test
-    func saveRecentPlayed_whenSongAlreadyExists_updatesIt_andMovesItToTopOfRecents() throws {
+    func saveRecentPlayed_whenSongAlreadyExists_updatesIt_andMovesItToTopOfRecents() async throws {
         let sut = try makeSUT()
         let firstVersion = Song.stub(trackID: 1, artistName: "Old Artist", trackName: "Old Name")
         let secondSong = Song.stub(trackID: 2, artistName: "Muse", trackName: "Uprising")
         let updatedVersion = Song.stub(trackID: 1, artistName: "New Artist", trackName: "New Name")
 
-        try sut.saveRecentPlayed(song: firstVersion)
-        try sut.saveRecentPlayed(song: secondSong)
-        try sut.saveRecentPlayed(song: updatedVersion)
+        try await sut.saveRecentPlayed(song: firstVersion)
+        try await sut.saveRecentPlayed(song: secondSong)
+        try await sut.saveRecentPlayed(song: updatedVersion)
 
-        let recentSongs = try sut.fetchRecentPlayed()
+        let recentSongs = try await sut.fetchRecentPlayed()
 
         #expect(recentSongs.count == 2)
         #expect(recentSongs.first?.trackID == 1)
@@ -61,42 +61,42 @@ struct LocalStorageRepositoryTests {
     }
 
     @Test
-    func searchSongs_matchesTrack_artist_andCollectionNames() throws {
+    func searchSongs_matchesTrack_artist_andCollectionNames() async throws {
         let sut = try makeSUT()
         let firstSong = Song.stub(trackID: 1, artistName: "Dream Theater", collectionName: "Octavarium", trackName: "Panic Attack")
         let secondSong = Song.stub(trackID: 2, artistName: "Muse", collectionName: "Absolution", trackName: "Hysteria")
 
-        try sut.save(song: firstSong)
-        try sut.save(song: secondSong)
+        try await sut.save(song: firstSong)
+        try await sut.save(song: secondSong)
 
-        #expect(try sut.searchSongs(term: "panic", limit: 10, offset: 0) == [firstSong])
-        #expect(try sut.searchSongs(term: "muse", limit: 10, offset: 0) == [secondSong])
-        #expect(try sut.searchSongs(term: "octavarium", limit: 10, offset: 0) == [firstSong])
+        #expect(try await sut.searchSongs(term: "panic", limit: 10, offset: 0) == [firstSong])
+        #expect(try await sut.searchSongs(term: "muse", limit: 10, offset: 0) == [secondSong])
+        #expect(try await sut.searchSongs(term: "octavarium", limit: 10, offset: 0) == [firstSong])
     }
 
     @Test
-    func searchSongs_appliesOffsetAndLimitAfterSorting() throws {
+    func searchSongs_appliesOffsetAndLimitAfterSorting() async throws {
         let sut = try makeSUT()
 
         for trackID in 1...5 {
-            try sut.save(song: .stub(trackID: trackID, artistName: "Muse", trackName: "Song \(trackID)"))
+            try await sut.save(song: .stub(trackID: trackID, artistName: "Muse", trackName: "Song \(trackID)"))
         }
 
-        let pagedSongs = try sut.searchSongs(term: "muse", limit: 2, offset: 1)
+        let pagedSongs = try await sut.searchSongs(term: "muse", limit: 2, offset: 1)
 
         #expect(pagedSongs.map(\.trackID) == [4, 3])
     }
 
     @Test
-    func save_keepsOnlyThe200MostRecentlySavedSongs() throws {
+    func save_keepsOnlyThe200MostRecentlySavedSongs() async throws {
         let sut = try makeSUT()
 
         for trackID in 1...202 {
-            try sut.save(song: .stub(trackID: trackID, trackName: "Song \(trackID)"))
+            try await sut.save(song: .stub(trackID: trackID, trackName: "Song \(trackID)"))
         }
 
-        let olderSongs = try sut.searchSongs(term: "Song 1", limit: 200, offset: 0)
-        let newestSong = try sut.searchSongs(term: "Song 202", limit: 200, offset: 0)
+        let olderSongs = try await sut.searchSongs(term: "Song 1", limit: 200, offset: 0)
+        let newestSong = try await sut.searchSongs(term: "Song 202", limit: 200, offset: 0)
 
         #expect(olderSongs.contains(where: { $0.trackID == 1 }) == false)
         #expect(olderSongs.contains(where: { $0.trackID == 2 }) == false)
@@ -104,14 +104,47 @@ struct LocalStorageRepositoryTests {
     }
 
     @Test
-    func fetchRecentPlayed_returnsOnly10MostRecentlyPlayedSongs() throws {
+    func saveRecentPlayed_whenRecentPlayedExceedsLimit_clearsLastPlayedAtFromOldestRecentSongsBeforeDeleting() async throws {
+        let sut = try makeSUT(maxStoredSongs: 20, maxRecentPlayedSongs: 3)
+
+        for trackID in 1...4 {
+            try await sut.saveRecentPlayed(song: .stub(trackID: trackID, artistName: "Queen", trackName: "Recent \(trackID)"))
+        }
+
+        let recentSongs = try await sut.fetchRecentPlayed()
+        let searchableOldestRecentSong = try await sut.searchSongs(term: "Recent 1", limit: 10, offset: 0)
+
+        #expect(recentSongs.map(\.trackID) == [4, 3, 2])
+        #expect(searchableOldestRecentSong.map(\.trackID) == [1])
+    }
+
+    @Test
+    func save_whenStorageExceedsLimit_deletesOldestNonRecentSong_andKeepsRecentPlayedSongsStored() async throws {
+        let sut = try makeSUT(maxStoredSongs: 3, maxRecentPlayedSongs: 2)
+
+        try await sut.save(song: .stub(trackID: 1, artistName: "Muse", trackName: "Search 1"))
+        try await sut.saveRecentPlayed(song: .stub(trackID: 2, artistName: "Muse", trackName: "Recent 2"))
+        try await sut.save(song: .stub(trackID: 3, artistName: "Muse", trackName: "Search 3"))
+        try await sut.save(song: .stub(trackID: 4, artistName: "Muse", trackName: "Search 4"))
+
+        let removedSong = try await sut.searchSongs(term: "Search 1", limit: 10, offset: 0)
+        let keptNonRecentSong = try await sut.searchSongs(term: "Search 3", limit: 10, offset: 0)
+        let keptRecentSong = try await sut.fetchRecentPlayed()
+
+        #expect(removedSong.isEmpty)
+        #expect(keptNonRecentSong.map(\.trackID) == [3])
+        #expect(keptRecentSong.map(\.trackID) == [2])
+    }
+
+    @Test
+    func fetchRecentPlayed_returnsOnly10MostRecentlyPlayedSongs() async throws {
         let sut = try makeSUT()
 
         for trackID in 1...12 {
-            try sut.saveRecentPlayed(song: .stub(trackID: trackID, trackName: "Song \(trackID)"))
+            try await sut.saveRecentPlayed(song: .stub(trackID: trackID, trackName: "Song \(trackID)"))
         }
 
-        let recentSongs = try sut.fetchRecentPlayed()
+        let recentSongs = try await sut.fetchRecentPlayed()
 
         #expect(recentSongs.count == 10)
         #expect(recentSongs.map(\.trackID) == Array((3...12).reversed()))

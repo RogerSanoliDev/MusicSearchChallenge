@@ -43,6 +43,8 @@ final class SongSearchViewModel {
     @ObservationIgnored
     private var paginationTask: Task<Void, Never>?
     @ObservationIgnored
+    private var recentPlayedTask: Task<Void, Never>?
+    @ObservationIgnored
     private var currentOffset = 0
 
     init(
@@ -53,28 +55,20 @@ final class SongSearchViewModel {
         self.searchService = searchService
         self.searchDebounceDuration = searchDebounceDuration
         self.searchLimit = searchLimit
-
-        Task { [weak self] in
-            await self?.loadRecentPlayed()
-        }
     }
 
     deinit {
         searchTask?.cancel()
         paginationTask?.cancel()
+        recentPlayedTask?.cancel()
     }
 
     private func scheduleSearch() {
-        searchTask?.cancel()
-        paginationTask?.cancel()
+        cancelSearchTasks()
 
-        let trimmedSearchText = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedSearchText.isEmpty else {
-            restoreInitialState()
-            songs = []
-            isLoadingNextPage = false
-            hasMorePages = false
-            currentOffset = 0
+        let term = trimmedSearchText
+        guard !term.isEmpty else {
+            showInitialStateAndRefreshRecentPlayed()
             return
         }
 
@@ -86,7 +80,7 @@ final class SongSearchViewModel {
                 guard !Task.isCancelled else { return }
 
                 self.resetPagination()
-                await self.searchPage(for: trimmedSearchText, offset: 0)
+                await self.searchPage(for: term, offset: 0)
             } catch is CancellationError {
                 return
             } catch {
@@ -103,21 +97,20 @@ final class SongSearchViewModel {
     }
 
     func reloadSearch() async {
-        searchTask?.cancel()
-        paginationTask?.cancel()
+        cancelSearchTasks()
 
-        let trimmedSearchText = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedSearchText.isEmpty else {
-            restoreInitialState()
-            songs = []
-            isLoadingNextPage = false
-            hasMorePages = false
-            currentOffset = 0
+        let term = trimmedSearchText
+        guard !term.isEmpty else {
+            showInitialStateAndRefreshRecentPlayed()
             return
         }
 
         resetPagination()
-        await searchPage(for: trimmedSearchText, offset: 0)
+        await searchPage(for: term, offset: 0)
+    }
+
+    func handleViewAppear() {
+        refreshRecentPlayed()
     }
 
     private func searchPage(for term: String, offset: Int) async {
@@ -126,11 +119,11 @@ final class SongSearchViewModel {
         }
 
         do {
-            let foundSongs = try await searchService.search(term: term, limit: searchLimit, offset: offset)
+            let foundSongs = try await fetchSongs(term: term, offset: offset)
 
             // Prevents stale async results and canceled searches.
             guard !Task.isCancelled else { return }
-            guard term == searchText.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
+            guard term == trimmedSearchText else { return }
 
             let songsCountBeforeAppend = songs.count
             let existingTrackIDs = Set(songs.map(\.trackID))
@@ -145,7 +138,7 @@ final class SongSearchViewModel {
             return
         } catch {
             guard !Task.isCancelled else { return }
-            guard term == searchText.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
+            guard term == trimmedSearchText else { return }
 
             isLoadingNextPage = false
             hasMorePages = false
@@ -157,11 +150,11 @@ final class SongSearchViewModel {
     }
 
     func loadNextPageIfNeeded() {
-        let trimmedSearchText = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let term = trimmedSearchText
 
         guard
             state == .success,
-            !trimmedSearchText.isEmpty,
+            !term.isEmpty,
             hasMorePages,
             !isLoadingNextPage
         else { return }
@@ -171,11 +164,11 @@ final class SongSearchViewModel {
 
         paginationTask = Task { [weak self] in
             guard let self else { return }
-            await self.searchPage(for: trimmedSearchText, offset: nextOffset)
+            await self.searchPage(for: term, offset: nextOffset)
         }
     }
 
-    func didSelectSong(at index: Int) -> Song? {
+    func currentSong(at index: Int) -> Song? {
         let availableSongs: [Song]
 
         switch state {
@@ -198,25 +191,49 @@ final class SongSearchViewModel {
 
             self.recentPlayedSongs = recentPlayedSongs
 
-            if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                restoreInitialState()
+            if trimmedSearchText.isEmpty {
+                applyInitialState()
             }
         } catch {
             guard !Task.isCancelled else { return }
             recentPlayedSongs = []
 
-            if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                restoreInitialState()
+            if trimmedSearchText.isEmpty {
+                applyInitialState()
             }
         }
     }
 
-    private func restoreInitialState() {
+    private func applyInitialState() {
         state = recentPlayedSongs.isEmpty ? .idle : .recentPlayed
-        if state == .recentPlayed {
-            Task { [weak self] in
-                await self?.loadRecentPlayed()
-            }
+    }
+
+    private func refreshRecentPlayed() {
+        recentPlayedTask?.cancel()
+        recentPlayedTask = Task { [weak self] in
+            await self?.loadRecentPlayed()
         }
+    }
+
+    nonisolated private func fetchSongs(term: String, offset: Int) async throws -> [Song] {
+        try await searchService.search(term: term, limit: searchLimit, offset: offset)
+    }
+
+    private var trimmedSearchText: String {
+        searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private func cancelSearchTasks() {
+        searchTask?.cancel()
+        paginationTask?.cancel()
+    }
+
+    private func showInitialStateAndRefreshRecentPlayed() {
+        songs = []
+        isLoadingNextPage = false
+        hasMorePages = false
+        currentOffset = 0
+        applyInitialState()
+        refreshRecentPlayed()
     }
 }

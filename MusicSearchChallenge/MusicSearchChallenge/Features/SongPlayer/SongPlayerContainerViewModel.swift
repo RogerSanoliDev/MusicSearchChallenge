@@ -12,8 +12,8 @@ import SongPlayer
 @MainActor
 @Observable
 final class SongPlayerContainerViewModel {
-    let songs: [Song]
-    let startIndex: Int
+    private(set) var songs: [Song]
+    private(set) var startIndex: Int
     var currentSong: Song?
 
     @ObservationIgnored

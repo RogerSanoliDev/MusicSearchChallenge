@@ -11,10 +11,11 @@ import SongPlayer
 
 @MainActor
 protocol LocalStorageRepositoryProtocol: Sendable {
-    func save(song: Song) throws
-    func saveRecentPlayed(song: Song) throws
-    func searchSongs(term: String, limit: Int, offset: Int) throws -> [Song]
-    func fetchRecentPlayed() throws -> [Song]
+    func save(song: Song) async throws
+    func save(songs: [Song]) async throws
+    func saveRecentPlayed(song: Song) async throws
+    func searchSongs(term: String, limit: Int, offset: Int) async throws -> [Song]
+    func fetchRecentPlayed() async throws -> [Song]
 }
 
 @MainActor
@@ -33,35 +34,43 @@ final class LocalStorageRepository: LocalStorageRepositoryProtocol {
         self.maxRecentPlayedSongs = maxRecentPlayedSongs
     }
 
-    func save(song: Song) throws {
-        try upsertStoredSong(with: song) { storedSong in
-            storedSong.updateFromSearch(song: song)
-        } insert: {
-            StoredSong(song: song)
+    func save(song: Song) async throws {
+        try await save(songs: [song])
+    }
+
+    func save(songs: [Song]) async throws {
+        guard !songs.isEmpty else { return }
+
+        for song in songs {
+            try await upsertStoredSong(with: song) { storedSong in
+                storedSong.updateFromSearch(song: song)
+            } insert: {
+                StoredSong(song: song)
+            }
         }
 
-        try pruneStoredSongsIfNeeded()
+        try await pruneStoredSongsIfNeeded()
         try modelContext.save()
     }
 
-    func saveRecentPlayed(song: Song) throws {
+    func saveRecentPlayed(song: Song) async throws {
         let now = Date()
 
-        try upsertStoredSong(with: song) { storedSong in
+        try await upsertStoredSong(with: song) { storedSong in
             storedSong.updateFromRecentPlayed(song: song, savedAt: now, lastPlayedAt: now)
         } insert: {
             StoredSong(song: song, savedAt: now, lastPlayedAt: now)
         }
 
-        try pruneStoredSongsIfNeeded()
+        try await pruneStoredSongsIfNeeded()
         try modelContext.save()
     }
 
-    func searchSongs(term: String, limit: Int, offset: Int) throws -> [Song] {
+    func searchSongs(term: String, limit: Int, offset: Int) async throws -> [Song] {
         let normalizedTerm = term.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !normalizedTerm.isEmpty, limit > 0, offset >= 0 else { return [] }
 
-        return try fetchAllStoredSongs()
+        return try await fetchAllStoredSongs()
             .filter { storedSong in
                 storedSong.trackName.localizedCaseInsensitiveContains(normalizedTerm)
                     || storedSong.artistName.localizedCaseInsensitiveContains(normalizedTerm)
@@ -79,8 +88,8 @@ final class LocalStorageRepository: LocalStorageRepositoryProtocol {
             .map(\.song)
     }
 
-    func fetchRecentPlayed() throws -> [Song] {
-        try fetchAllStoredSongs()
+    func fetchRecentPlayed() async throws -> [Song] {
+        try await fetchAllStoredSongs()
             .filter { $0.lastPlayedAt != nil }
             .sorted { lhs, rhs in
                 (lhs.lastPlayedAt ?? .distantPast) > (rhs.lastPlayedAt ?? .distantPast)
@@ -93,7 +102,7 @@ final class LocalStorageRepository: LocalStorageRepositoryProtocol {
         with song: Song,
         update: (StoredSong) -> Void,
         insert: () -> StoredSong
-    ) throws {
+    )  async throws {
         let trackID = song.trackID
         let existingSong = try modelContext.fetch(
             FetchDescriptor<StoredSong>(
@@ -110,19 +119,39 @@ final class LocalStorageRepository: LocalStorageRepositoryProtocol {
         }
     }
 
-    private func fetchAllStoredSongs() throws -> [StoredSong] {
+    private func fetchAllStoredSongs() async throws -> [StoredSong] {
         let descriptor = FetchDescriptor<StoredSong>(
             sortBy: [SortDescriptor(\.savedAt, order: .reverse)]
         )
         return try modelContext.fetch(descriptor)
     }
 
-    private func pruneStoredSongsIfNeeded() throws {
-        let storedSongs = try fetchAllStoredSongs()
+    private func pruneStoredSongsIfNeeded() async throws {
+        let storedSongs = try await fetchAllStoredSongs()
+        let recentPlayedSongs = storedSongs
+            .filter { $0.lastPlayedAt != nil }
+            .sorted { lhs, rhs in
+                (lhs.lastPlayedAt ?? .distantPast) < (rhs.lastPlayedAt ?? .distantPast)
+            }
 
-        guard storedSongs.count > maxStoredSongs else { return }
+        if recentPlayedSongs.count > maxRecentPlayedSongs {
+            let recentSongsToClear = recentPlayedSongs.prefix(recentPlayedSongs.count - maxRecentPlayedSongs)
 
-        for song in storedSongs.dropFirst(maxStoredSongs) {
+            for song in recentSongsToClear {
+                song.lastPlayedAt = nil
+            }
+        }
+
+        let songsToDeleteCount = storedSongs.count - maxStoredSongs
+        guard songsToDeleteCount > 0 else { return }
+
+        let nonRecentSongsByOldestSavedAt = storedSongs
+            .filter { $0.lastPlayedAt == nil }
+            .sorted { lhs, rhs in
+                return lhs.savedAt < rhs.savedAt
+            }
+
+        for song in nonRecentSongsByOldestSavedAt.prefix(songsToDeleteCount) {
             modelContext.delete(song)
         }
     }

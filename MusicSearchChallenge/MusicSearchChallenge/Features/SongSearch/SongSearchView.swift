@@ -28,6 +28,9 @@ struct SongSearchView: View {
             .preferredColorScheme(.dark)
             .navigationTitle(Text("search.title"))
             .navigationBarTitleDisplayMode(.large)
+            .onAppear {
+                viewModel.handleViewAppear()
+            }
             .searchable(
                 text: $viewModel.searchText,
                 placement: .navigationBarDrawer(displayMode: .always),
@@ -54,7 +57,7 @@ struct SongSearchView: View {
                 sectionTitle: "Recently Played",
                 showsPaginationLoader: false,
                 onSongSelected: { index in
-                    guard let song = viewModel.didSelectSong(at: index) else { return }
+                    guard let song = viewModel.currentSong(at: index) else { return }
                     onSongSelected(song)
                 },
                 onMoreOptionsSelected: onMoreOptionsSelected
@@ -76,7 +79,7 @@ struct SongSearchView: View {
                 songs: viewModel.songs,
                 showsPaginationLoader: viewModel.hasMorePages,
                 onSongSelected: { index in
-                    guard let song = viewModel.didSelectSong(at: index) else { return }
+                    guard let song = viewModel.currentSong(at: index) else { return }
                     onSongSelected(song)
                 },
                 onMoreOptionsSelected: onMoreOptionsSelected,

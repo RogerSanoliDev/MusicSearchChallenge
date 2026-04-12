@@ -27,6 +27,8 @@ actor SearchServiceMock: SearchServiceProtocol {
     var searchCalls: [SearchCall] = []
     var fetchAlbumCalls: [FetchAlbumCall] = []
     var saveRecentPlayedCalls: [SaveRecentPlayedCall] = []
+    var fetchRecentPlayedCallCount = 0
+    var queuedFetchRecentPlayedResults: [[Song]] = []
     var searchHandler: (@Sendable (String, Int, Int) async throws -> [Song])?
     var fetchAlbumHandler: (@Sendable (Int) async throws -> [Song])?
     var fetchRecentPlayedHandler: (@Sendable () async throws -> [Song])?
@@ -49,11 +51,19 @@ actor SearchServiceMock: SearchServiceProtocol {
         fetchRecentPlayedHandler = handler
     }
 
+    func enqueueFetchRecentPlayedResults(_ results: [[Song]]) {
+        queuedFetchRecentPlayedResults.append(contentsOf: results)
+    }
+
+    func getFetchRecentPlayedCallCount() -> Int {
+        fetchRecentPlayedCallCount
+    }
+
     func search(term: String, limit: Int, offset: Int) async throws -> [Song] {
         searchCalls.append(SearchCall(term: term, limit: limit, offset: offset))
 
         guard let searchHandler else {
-            fatalError("searchHandler not set on SearchServiceMock")
+            return []
         }
 
         return try await searchHandler(term, limit, offset)
@@ -63,7 +73,7 @@ actor SearchServiceMock: SearchServiceProtocol {
         fetchAlbumCalls.append(FetchAlbumCall(collectionId: collectionId))
 
         guard let fetchAlbumHandler else {
-            fatalError("fetchAlbumHandler not set on SearchServiceMock")
+            return []
         }
 
         return try await fetchAlbumHandler(collectionId)
@@ -74,8 +84,14 @@ actor SearchServiceMock: SearchServiceProtocol {
     }
 
     func fetchRecentPlayed() async throws -> [Song] {
+        fetchRecentPlayedCallCount += 1
+
+        if !queuedFetchRecentPlayedResults.isEmpty {
+            return queuedFetchRecentPlayedResults.removeFirst()
+        }
+
         guard let fetchRecentPlayedHandler else {
-            fatalError("fetchRecentPlayedHandler not set on SearchServiceMock")
+            return []
         }
 
         return try await fetchRecentPlayedHandler()
