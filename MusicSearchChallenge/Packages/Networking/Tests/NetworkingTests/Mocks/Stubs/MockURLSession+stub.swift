@@ -10,10 +10,14 @@ import Foundation
 extension MockURLSession {
     static func stub(data: Data? = MockResponse.stub().toData(),
                      response: URLResponse? = .stub(),
-                     error: Error? = nil) -> MockURLSession {
+                     error: Error? = nil,
+                     delayNanoseconds: UInt64 = 0,
+                     callCounter: MockURLSessionCallCounter? = nil) -> MockURLSession {
         
         return MockURLSession(data: data,
                               response: response,
-                              error: error)
+                              error: error,
+                              delayNanoseconds: delayNanoseconds,
+                              callCounter: callCounter)
     }
 }

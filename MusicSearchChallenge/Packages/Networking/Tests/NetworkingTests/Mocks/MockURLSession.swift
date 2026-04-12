@@ -13,8 +13,16 @@ struct MockURLSession: URLSessionProtocol {
     var data: Data?
     var response: URLResponse?
     var error: Error?
+    var delayNanoseconds: UInt64 = 0
+    var callCounter: MockURLSessionCallCounter?
     
     func data(from url: URL) async throws -> (Data, URLResponse) {
+        await callCounter?.increment()
+        
+        if delayNanoseconds > 0 {
+            try? await Task.sleep(nanoseconds: delayNanoseconds)
+        }
+        
         if let error {
             throw error
         }

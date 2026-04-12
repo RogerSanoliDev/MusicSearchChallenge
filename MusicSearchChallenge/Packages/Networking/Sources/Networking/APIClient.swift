@@ -18,14 +18,22 @@ public extension APIClientProtocol {
 }
 
 public final class APIClient: APIClientProtocol {
-    
     public static let shared = APIClient()
-    private init() {}
+    
+    private let requestDeduplicator: any RequestDeduplicating
+    
+    public init() {
+        self.requestDeduplicator = InFlightRequestDeduplicator()
+    }
+    
+    init(requestDeduplicator: any RequestDeduplicating) {
+        self.requestDeduplicator = requestDeduplicator
+    }
     
     public func performRequest<T:Decodable>(endpoint: Endpoint, session: URLSessionProtocol) async throws -> T {
         guard let url = endpoint.url else { throw NetworkError.badURLFormat }
         
-        let (data, response) = try await session.data(from: url)
+        let (data, response) = try await requestDeduplicator.data(for: url, session: session)
         
         guard let httpResponse = response as? HTTPURLResponse else {
             throw NetworkError.invalidHTTPResponse
