@@ -7,18 +7,24 @@
 
 import SwiftUI
 import SongPlayer
+import TipKit
 
 struct SongSearchView: View {
     @State private var viewModel = SongSearchViewModel()
+    private let showsTips: Bool
     private let onSongSelected: (Song) -> Void
     private let onMoreOptionsSelected: (Song) -> Void
+    private let searchStartTip = SearchStartTip()
+    private let recentPlayedDeleteTip = RecentPlayedDeleteTip()
 
     init(
         viewModel: SongSearchViewModel = SongSearchViewModel(),
+        showsTips: Bool = true,
         onSongSelected: @escaping (Song) -> Void = { _ in },
         onMoreOptionsSelected: @escaping (Song) -> Void = { _ in }
     ) {
         _viewModel = State(initialValue: viewModel)
+        self.showsTips = showsTips
         self.onSongSelected = onSongSelected
         self.onMoreOptionsSelected = onMoreOptionsSelected
     }
@@ -51,11 +57,13 @@ struct SongSearchView: View {
                 systemImageName: "magnifyingglass",
                 message: String(localized: "search.idle.message")
             )
+            .popoverTip(showsTips ? searchStartTip : nil, arrowEdge: .top)
         case .recentPlayed:
             SongListView(
                 songs: viewModel.recentPlayedSongs,
                 sectionTitle: String(localized: "recent_played.title"),
                 showsPaginationLoader: false,
+                rowTip: showsTips ? recentPlayedDeleteTip : nil,
                 onSongSelected: { index in
                     guard let song = viewModel.currentSong(at: index) else { return }
                     onSongSelected(song)

@@ -20,7 +20,7 @@ struct SongSearchViewTests {
 
         assertSnapshot(
             of: NavigationStack {
-                SongSearchView(viewModel: viewModel)
+                SongSearchView(viewModel: viewModel, showsTips: false)
             },
             as: .image(layout: .device(config: .iPhone13))
         )
@@ -33,7 +33,7 @@ struct SongSearchViewTests {
 
         assertSnapshot(
             of: NavigationStack {
-                SongSearchView(viewModel: viewModel)
+                SongSearchView(viewModel: viewModel, showsTips: false)
             },
             as: .image(layout: .device(config: .iPhone13))
         )
@@ -47,7 +47,7 @@ struct SongSearchViewTests {
 
         assertSnapshot(
             of: NavigationStack {
-                SongSearchView(viewModel: viewModel)
+                SongSearchView(viewModel: viewModel, showsTips: false)
             },
             as: .image(layout: .device(config: .iPhone13))
         )
@@ -60,7 +60,7 @@ struct SongSearchViewTests {
 
         assertSnapshot(
             of: NavigationStack {
-                SongSearchView(viewModel: viewModel)
+                SongSearchView(viewModel: viewModel, showsTips: false)
             },
             as: .image(layout: .device(config: .iPhone13))
         )
@@ -78,7 +78,7 @@ struct SongSearchViewTests {
 
         assertSnapshot(
             of: NavigationStack {
-                SongSearchView(viewModel: viewModel)
+                SongSearchView(viewModel: viewModel, showsTips: false)
             },
             as: .image(layout: .device(config: .iPhone13))
         )
@@ -98,7 +98,7 @@ struct SongSearchViewTests {
 
         assertSnapshot(
             of: NavigationStack {
-                SongSearchView(viewModel: viewModel)
+                SongSearchView(viewModel: viewModel, showsTips: false)
             },
             as: .image(layout: .device(config: .iPhone13))
         )

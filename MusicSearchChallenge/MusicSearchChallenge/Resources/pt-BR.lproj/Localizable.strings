@@ -2,11 +2,15 @@
 "search.screen.voiceover" = "Tela de busca de músicas";
 "search.field.placeholder" = "Buscar músicas";
 "search.idle.message" = "Comece a procurar músicas";
+"search.tip.start.title" = "Comece buscando";
+"search.tip.start.message" = "Digite uma música, artista ou álbum no campo de busca acima para começar.";
 "search.loading.voiceover" = "Carregando músicas";
 "search.error.message" = "Algo deu errado";
 "search.empty.message" = "Nenhum resultado encontrado para \"%@\"";
 "album.empty.message" = "Nenhuma música encontrada para este álbum";
 "recent_played.title" = "Tocadas recentemente";
+"recent_played.tip.delete.title" = "Deslize para remover";
+"recent_played.tip.delete.message" = "Deslize esta música para apagá-la da sua lista de tocadas recentemente.";
 "common.more_options" = "Mais opções";
 "more_options.view_album" = "Ver álbum";
 "splash.title" = "Music Search Challenge\npor Roger Oliveira";
