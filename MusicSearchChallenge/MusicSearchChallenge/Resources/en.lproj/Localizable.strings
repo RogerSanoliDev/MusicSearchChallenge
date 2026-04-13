@@ -2,11 +2,15 @@
 "search.screen.voiceover" = "Song search screen";
 "search.field.placeholder" = "Search songs";
 "search.idle.message" = "Start searching songs";
+"search.tip.start.title" = "Start with a search";
+"search.tip.start.message" = "Type a song, artist, or album in the search field above to get things going.";
 "search.loading.voiceover" = "Loading songs";
 "search.error.message" = "Something went wrong";
 "search.empty.message" = "No results found for \"%@\"";
 "album.empty.message" = "No songs found for this album";
 "recent_played.title" = "Recently Played";
+"recent_played.tip.delete.title" = "Swipe to remove";
+"recent_played.tip.delete.message" = "Swipe this song to delete it from your recently played list.";
 "common.more_options" = "More options";
 "more_options.view_album" = "View album";
 "splash.title" = "Music Search Challenge\nby Roger Oliveira";

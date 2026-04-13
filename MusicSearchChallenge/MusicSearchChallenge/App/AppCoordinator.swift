@@ -12,20 +12,6 @@ import SongPlayer
 @MainActor
 @Observable
 final class AppCoordinator {
-    struct PlayerContext: Hashable {
-        let id = UUID()
-        let songs: [Song]
-        let startIndex: Int
-
-        static func == (lhs: PlayerContext, rhs: PlayerContext) -> Bool {
-            lhs.id == rhs.id
-        }
-
-        func hash(into hasher: inout Hasher) {
-            hasher.combine(id)
-        }
-    }
-
     enum Page: Hashable, Identifiable {
         case songSearch
         case songPlayer(PlayerContext)
@@ -46,6 +32,20 @@ final class AppCoordinator {
         }
 
         static func == (lhs: Page, rhs: Page) -> Bool {
+            lhs.id == rhs.id
+        }
+
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(id)
+        }
+    }
+    
+    struct PlayerContext: Hashable {
+        let id = UUID()
+        let songs: [Song]
+        let startIndex: Int
+
+        static func == (lhs: PlayerContext, rhs: PlayerContext) -> Bool {
             lhs.id == rhs.id
         }
 

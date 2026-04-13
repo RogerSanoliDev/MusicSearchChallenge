@@ -7,19 +7,23 @@
 
 import SwiftUI
 import SongPlayer
+import TipKit
 
 struct SongCell: View {
     private let song: Song
     private let showsMoreOptionsButton: Bool
+    private let tip: (any Tip)?
     private let onMoreOptionsTap: (() -> Void)?
 
     init(
         song: Song,
         showsMoreOptionsButton: Bool,
+        tip: (any Tip)? = nil,
         onMoreOptionsTap: (() -> Void)? = nil
     ) {
         self.song = song
         self.showsMoreOptionsButton = showsMoreOptionsButton
+        self.tip = tip
         self.onMoreOptionsTap = onMoreOptionsTap
     }
 
@@ -57,6 +61,14 @@ struct SongCell: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .leading) {
+            Color.clear
+                .frame(width: 1, height: 1)
+                .padding(.leading, 18)
+                .popoverTip(tip, arrowEdge: .leading)
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+        }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(
             Text(

@@ -2,11 +2,15 @@
 "search.screen.voiceover" = "歌曲搜索页面";
 "search.field.placeholder" = "搜索歌曲";
 "search.idle.message" = "开始搜索歌曲";
+"search.tip.start.title" = "先搜索一下";
+"search.tip.start.message" = "在上方搜索框中输入歌曲、歌手或专辑，即可开始。";
 "search.loading.voiceover" = "正在加载歌曲";
 "search.error.message" = "出了点问题";
 "search.empty.message" = "没有找到“%@”的结果";
 "album.empty.message" = "未找到此专辑的歌曲";
 "recent_played.title" = "最近播放";
+"recent_played.tip.delete.title" = "滑动即可删除";
+"recent_played.tip.delete.message" = "滑动这首歌，即可将它从最近播放列表中移除。";
 "common.more_options" = "更多选项";
 "more_options.view_album" = "查看专辑";
 "splash.title" = "Music Search Challenge\n作者 Roger Oliveira";

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SongPlayer
+import TipKit
 
 struct SongListView: View {
     let songs: [Song]
@@ -14,6 +15,7 @@ struct SongListView: View {
     private let isPlaylist: Bool
     private let showsPaginationLoader: Bool
     private let showsLeadingSwipeAction: Bool
+    private let rowTip: (any Tip)?
     private let onSongSelected: (Int) -> Void
     private let onLeadingSwipeAction: ((Song) -> Void)?
     private let onMoreOptionsSelected: ((Song) -> Void)?
@@ -24,6 +26,7 @@ struct SongListView: View {
         sectionTitle: String? = nil,
         isPlaylist: Bool = false,
         showsPaginationLoader: Bool = true,
+        rowTip: (any Tip)? = nil,
         onSongSelected: @escaping (Int) -> Void = { _ in },
         onLeadingSwipeAction: ((Song) -> Void)? = nil,
         onMoreOptionsSelected: ((Song) -> Void)? = nil,
@@ -34,6 +37,7 @@ struct SongListView: View {
         self.isPlaylist = isPlaylist
         self.showsPaginationLoader = showsPaginationLoader
         self.showsLeadingSwipeAction = onLeadingSwipeAction != nil
+        self.rowTip = rowTip
         self.onSongSelected = onSongSelected
         self.onLeadingSwipeAction = onLeadingSwipeAction
         self.onMoreOptionsSelected = onMoreOptionsSelected
@@ -80,6 +84,7 @@ struct SongListView: View {
             SongCell(
                 song: song,
                 showsMoreOptionsButton: !isPlaylist,
+                tip: index == 0 ? rowTip : nil,
                 onMoreOptionsTap: {
                     onMoreOptionsSelected?(song)
                 }
