@@ -27,17 +27,7 @@ struct AlbumView: View {
             case .loading:
                 VStack(spacing: 0) {
                     headerView
-                    List(0..<10, id: \.self) { _ in
-                        SongCellLoadingView()
-                            .listRowInsets(EdgeInsets())
-                            .listRowSeparator(.hidden)
-                            .listRowBackground(Color.clear)
-                    }
-                    .listStyle(.plain)
-                    .scrollDisabled(true)
-                    .scrollIndicators(.hidden)
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel(Text("search.loading.voiceover"))
+                    SongListLoadingView()
                 }
             case .success:
                 VStack(spacing: 0) {
@@ -50,6 +40,14 @@ struct AlbumView: View {
                         }
                     )
                 }
+            case .empty:
+                VStack(spacing: 0) {
+                    headerView
+                    InfoView(
+                        systemImageName: "music.note.list",
+                        message: String(localized: "album.empty.message")
+                    )
+                }
             case .error:
                 VStack(spacing: 0) {
                     headerView
@@ -60,7 +58,6 @@ struct AlbumView: View {
                 }
             }
         }
-        .preferredColorScheme(.dark)
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.fetchAlbum()
@@ -90,6 +87,7 @@ struct AlbumView: View {
         .padding(.horizontal, 24)
         .padding(.top, 24)
         .padding(.bottom, 20)
+        .accessibilityElement(children: .combine)
     }
 }
 

@@ -6,5 +6,9 @@
 "search.error.message" = "Algo deu errado";
 "search.empty.message" = "Nenhum resultado encontrado para \"%@\"";
 "album.empty.message" = "Nenhuma música encontrada para este álbum";
+"recent_played.title" = "Tocadas recentemente";
+"common.more_options" = "Mais opções";
+"more_options.view_album" = "Ver álbum";
+"splash.title" = "Music Search Challenge\npor Roger Oliveira";
 "song_list.remove" = "Remover";
 "song_list.row.voiceover" = "%1$@, de %2$@";

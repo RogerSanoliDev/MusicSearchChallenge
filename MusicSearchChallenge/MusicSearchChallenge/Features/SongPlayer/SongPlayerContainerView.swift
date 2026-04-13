@@ -46,7 +46,7 @@ struct SongPlayerContainerView: View {
                     } label: {
                         Image(systemName: "ellipsis")
                     }
-                    .accessibilityLabel(Text("More options"))
+                    .accessibilityLabel(Text("common.more_options"))
                 }
             }
         }

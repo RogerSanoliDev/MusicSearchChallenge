@@ -4,6 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "SongPlayer",
+    defaultLocalization: "en",
     platforms: [
         .iOS(.v26)
     ],
@@ -20,7 +21,10 @@ let package = Package(
     targets: [
         .target(
             name: "SongPlayer",
-            dependencies: ["Networking"]
+            dependencies: ["Networking"],
+            resources: [
+                .process("Resources")
+            ]
         ),
         .testTarget(
             name: "SongPlayerTests",

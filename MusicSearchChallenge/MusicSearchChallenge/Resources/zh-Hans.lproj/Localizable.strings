@@ -6,5 +6,9 @@
 "search.error.message" = "出了点问题";
 "search.empty.message" = "没有找到“%@”的结果";
 "album.empty.message" = "未找到此专辑的歌曲";
+"recent_played.title" = "最近播放";
+"common.more_options" = "更多选项";
+"more_options.view_album" = "查看专辑";
+"splash.title" = "Music Search Challenge\n作者 Roger Oliveira";
 "song_list.remove" = "移除";
 "song_list.row.voiceover" = "%2$@的%1$@";

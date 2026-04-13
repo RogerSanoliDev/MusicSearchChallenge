@@ -5,7 +5,6 @@
 //  Created by Codex on 10/04/26.
 //
 
-import Foundation
 import Observation
 import SongPlayer
 
@@ -15,6 +14,7 @@ final class AlbumViewModel {
     enum State: Equatable {
         case loading
         case success
+        case empty
         case error
     }
 
@@ -43,7 +43,7 @@ final class AlbumViewModel {
         do {
             let albumSongs = try await searchService.fetchAlbum(collectionId: song.collectionID)
             songs = albumSongs
-            state = albumSongs.isEmpty ? .error : .success
+            state = albumSongs.isEmpty ? .empty : .success
         } catch is CancellationError {
             songs = []
             hasLoaded = false

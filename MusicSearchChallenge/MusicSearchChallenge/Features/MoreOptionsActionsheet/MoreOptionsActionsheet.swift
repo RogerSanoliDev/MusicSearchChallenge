@@ -33,14 +33,16 @@ struct MoreOptionsActionsheet: View {
                     Image(systemName: "music.note.square.stack")
                         .font(.title3)
                         .padding(.leading, 20)
-                    Text("View album")
+                    Text("more_options.view_album")
                         .font(.body.weight(.medium))
                     Spacer()
                 }
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(Text("more_options.view_album"))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .contain)
         .preferredColorScheme(.dark)
     }
 }

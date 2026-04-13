@@ -1,0 +1,9 @@
+"player.repeat" = "重复播放列表";
+"player.playback_position" = "播放位置";
+"player.playback_position.value" = "%1$@ / %2$@";
+"player.previous" = "上一首";
+"player.next" = "下一首";
+"common.play" = "播放";
+"common.pause" = "暂停";
+"common.on" = "开";
+"common.off" = "关";

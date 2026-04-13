@@ -43,7 +43,13 @@ struct SongListView: View {
     var body: some View {
         List {
             if let sectionTitle {
-                sectionHeader(title: sectionTitle)
+                Text(sectionTitle)
+                    .font(.headline)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 12)
+                    .padding(.bottom, 4)
                     .listRowInsets(EdgeInsets())
                     .listRowSeparator(.hidden)
                     .listRowBackground(Color.clear)
@@ -96,17 +102,6 @@ struct SongListView: View {
             .listRowSeparator(.hidden)
             .listRowBackground(Color.clear)
         }
-    }
-
-    @ViewBuilder
-    private func sectionHeader(title: String) -> some View {
-        Text(title)
-            .font(.headline)
-            .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 16)
-            .padding(.top, 12)
-            .padding(.bottom, 4)
     }
 }
 

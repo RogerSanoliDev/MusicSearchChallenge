@@ -1,0 +1,9 @@
+"player.repeat" = "Repeat playlist";
+"player.playback_position" = "Playback position";
+"player.playback_position.value" = "%1$@ of %2$@";
+"player.previous" = "Previous song";
+"player.next" = "Next song";
+"common.play" = "Play";
+"common.pause" = "Pause";
+"common.on" = "On";
+"common.off" = "Off";

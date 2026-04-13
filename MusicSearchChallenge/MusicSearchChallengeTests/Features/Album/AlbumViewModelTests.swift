@@ -49,7 +49,7 @@ struct AlbumViewModelTests {
     }
 
     @Test
-    func fetchAlbum_withEmptyResults_setsErrorState() async {
+    func fetchAlbum_withEmptyResults_setsEmptyState() async {
         let mock = SearchServiceMock()
         let song = Song.stub(collectionID: 7)
 
@@ -59,7 +59,7 @@ struct AlbumViewModelTests {
 
         await sut.fetchAlbum()
 
-        #expect(sut.state == .error)
+        #expect(sut.state == .empty)
         #expect(sut.songs.isEmpty)
     }
 
