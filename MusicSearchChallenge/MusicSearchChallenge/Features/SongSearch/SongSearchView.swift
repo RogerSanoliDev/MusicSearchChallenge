@@ -25,7 +25,6 @@ struct SongSearchView: View {
 
     var body: some View {
         contentView
-            .preferredColorScheme(.dark)
             .navigationTitle(Text("search.title"))
             .navigationBarTitleDisplayMode(.large)
             .onAppear {
@@ -41,6 +40,7 @@ struct SongSearchView: View {
             }
             .animation(.easeInOut(duration: 0.2), value: viewModel.state)
             .accessibilityLabel(Text("search.screen.voiceover"))
+            .preferredColorScheme(.dark)
     }
 
     @ViewBuilder
@@ -54,7 +54,7 @@ struct SongSearchView: View {
         case .recentPlayed:
             SongListView(
                 songs: viewModel.recentPlayedSongs,
-                sectionTitle: "Recently Played",
+                sectionTitle: String(localized: "recent_played.title"),
                 showsPaginationLoader: false,
                 onSongSelected: { index in
                     guard let song = viewModel.currentSong(at: index) else { return }
@@ -68,17 +68,7 @@ struct SongSearchView: View {
                 onMoreOptionsSelected: onMoreOptionsSelected
             )
         case .loading:
-            List(0..<10, id: \.self) { _ in
-                SongCellLoadingView()
-                    .listRowInsets(EdgeInsets())
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(Color.clear)
-            }
-            .listStyle(.plain)
-            .scrollDisabled(true)
-            .scrollIndicators(.hidden)
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(Text("search.loading.voiceover"))
+            SongListLoadingView()
         case .success:
             SongListView(
                 songs: viewModel.songs,

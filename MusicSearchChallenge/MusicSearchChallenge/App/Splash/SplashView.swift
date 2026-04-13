@@ -26,6 +26,7 @@ struct SplashView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 100, height: 100)
+                        .accessibilityHidden(true)
                     
                     Spacer()
                 }
@@ -33,7 +34,7 @@ struct SplashView: View {
                 VStack {
                     Spacer()
                     
-                    Text("Music Search Challenge\nby Roger Oliveira")
+                    Text("splash.title")
                         .font(.headline)
                         .multilineTextAlignment(.center)
                         .foregroundStyle(.white.opacity(0.9))
@@ -43,6 +44,7 @@ struct SplashView: View {
             }
         }
         .ignoresSafeArea()
+        .accessibilityElement(children: .contain)
     }
 }
 

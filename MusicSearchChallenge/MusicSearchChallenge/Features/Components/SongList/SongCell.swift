@@ -53,7 +53,7 @@ struct SongCell: View {
                         .frame(width: 28, height: 28)
                 }
                 .buttonStyle(.glass)
-                .accessibilityLabel(Text("More options"))
+                .accessibilityLabel(Text("common.more_options"))
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -70,6 +70,7 @@ struct SongCell: View {
                 )
             )
         )
+        .accessibilityAddTraits(.isButton)
     }
 }
 

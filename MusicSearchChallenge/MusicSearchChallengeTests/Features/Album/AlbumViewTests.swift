@@ -66,4 +66,40 @@ struct AlbumViewTests {
             as: .image(layout: .device(config: .iPhone13))
         )
     }
+
+    @Test(.snapshots(record: .missing))
+    func albumView_empty_matchesSnapshot() {
+        let viewModel = AlbumViewModel(
+            song: .stub(
+                artistName: "Angine de Poitrine",
+                collectionName: "Vol.II"
+            )
+        )
+        viewModel.state = .empty
+
+        assertSnapshot(
+            of: NavigationStack {
+                AlbumView(song: viewModel.song, viewModel: viewModel)
+            },
+            as: .image(layout: .device(config: .iPhone13))
+        )
+    }
+
+    @Test(.snapshots(record: .missing))
+    func albumView_error_matchesSnapshot() {
+        let viewModel = AlbumViewModel(
+            song: .stub(
+                artistName: "Angine de Poitrine",
+                collectionName: "Vol.II"
+            )
+        )
+        viewModel.state = .error
+
+        assertSnapshot(
+            of: NavigationStack {
+                AlbumView(song: viewModel.song, viewModel: viewModel)
+            },
+            as: .image(layout: .device(config: .iPhone13))
+        )
+    }
 }

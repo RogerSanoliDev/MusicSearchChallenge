@@ -60,8 +60,8 @@ public struct SongPlayerView: View {
                                 .padding(10)
                         }
                         .buttonStyle(.glass)
-                        .accessibilityLabel(Text("Repeat playlist"))
-                        .accessibilityValue(Text(viewModel.isRepeating ? "On" : "Off"))
+                        .accessibilityLabel(Text(localizedString("player.repeat")))
+                        .accessibilityValue(Text(localizedString(viewModel.isRepeating ? "common.on" : "common.off")))
                     }
 
                     VStack(spacing: 8) {
@@ -73,8 +73,16 @@ public struct SongPlayerView: View {
                             in: 0...max(viewModel.duration, 0.1)
                         )
                         .tint(.white)
-                        .accessibilityLabel(Text("Playback position"))
-                        .accessibilityValue(Text("\(viewModel.elapsedTimeText) of \(viewModel.durationText)"))
+                        .accessibilityLabel(Text(localizedString("player.playback_position")))
+                        .accessibilityValue(
+                            Text(
+                                String(
+                                    format: localizedString("player.playback_position.value"),
+                                    viewModel.elapsedTimeText,
+                                    viewModel.durationText
+                                )
+                            )
+                        )
 
                         HStack {
                             Text(viewModel.elapsedTimeText)
@@ -93,7 +101,7 @@ public struct SongPlayerView: View {
                                 .font(.title)
                         }
                         .buttonStyle(.glass)
-                        .accessibilityLabel(Text("Previous song"))
+                        .accessibilityLabel(Text(localizedString("player.previous")))
 
                         Button {
                             viewModel.togglePlayPause()
@@ -103,7 +111,7 @@ public struct SongPlayerView: View {
                                 .frame(width: 84, height: 84)
                         }
                         .buttonStyle(.glass)
-                        .accessibilityLabel(Text(viewModel.isPlaying ? "Pause" : "Play"))
+                        .accessibilityLabel(Text(localizedString(viewModel.isPlaying ? "common.pause" : "common.play")))
 
                         Button {
                             viewModel.playNext()
@@ -114,7 +122,7 @@ public struct SongPlayerView: View {
                         }
                         .buttonStyle(.glass)
                         .disabled(!viewModel.canPlayNext)
-                        .accessibilityLabel(Text("Next song"))
+                        .accessibilityLabel(Text(localizedString("player.next")))
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -142,6 +150,10 @@ private extension SongPlayerViewModel {
         let seconds = totalSeconds % 60
         return String(format: "%d:%02d", minutes, seconds)
     }
+}
+
+private func localizedString(_ key: String) -> String {
+    String(localized: String.LocalizationValue(key), bundle: .module)
 }
 
 #Preview {

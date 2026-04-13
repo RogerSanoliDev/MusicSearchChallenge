@@ -1,0 +1,9 @@
+"player.repeat" = "Repetir playlist";
+"player.playback_position" = "Posição da reprodução";
+"player.playback_position.value" = "%1$@ de %2$@";
+"player.previous" = "Música anterior";
+"player.next" = "Próxima música";
+"common.play" = "Reproduzir";
+"common.pause" = "Pausar";
+"common.on" = "Ativado";
+"common.off" = "Desativado";
