@@ -19,6 +19,7 @@ final class LocalStorageRepositoryMock: LocalStorageRepositoryProtocol {
 
     private(set) var savedSongs: [Song] = []
     private(set) var savedRecentPlayedSongs: [Song] = []
+    private(set) var removedRecentPlayedSongs: [Song] = []
     private(set) var searchCalls: [SearchCall] = []
     var searchSongsResult: Result<[Song], Error> = .success([])
     var recentPlayedResult: Result<[Song], Error> = .success([])
@@ -33,6 +34,10 @@ final class LocalStorageRepositoryMock: LocalStorageRepositoryProtocol {
 
     func saveRecentPlayed(song: Song) async throws {
         savedRecentPlayedSongs.append(song)
+    }
+
+    func removeRecentPlayed(song: Song) async throws {
+        removedRecentPlayedSongs.append(song)
     }
 
     func searchSongs(term: String, limit: Int, offset: Int) async throws -> [Song] {

@@ -61,6 +61,21 @@ struct LocalStorageRepositoryTests {
     }
 
     @Test
+    func removeRecentPlayed_clearsSongLastPlayedAt_andKeepsItSearchable() async throws {
+        let sut = try makeSUT()
+        let song = Song.stub(trackID: 1, artistName: "Queen", trackName: "Bohemian Rhapsody")
+
+        try await sut.saveRecentPlayed(song: song)
+        try await sut.removeRecentPlayed(song: song)
+
+        let recentSongs = try await sut.fetchRecentPlayed()
+        let foundSongs = try await sut.searchSongs(term: "bohemian", limit: 10, offset: 0)
+
+        #expect(recentSongs.isEmpty)
+        #expect(foundSongs == [song])
+    }
+
+    @Test
     func searchSongs_matchesTrack_artist_andCollectionNames() async throws {
         let sut = try makeSUT()
         let firstSong = Song.stub(trackID: 1, artistName: "Dream Theater", collectionName: "Octavarium", trackName: "Panic Attack")

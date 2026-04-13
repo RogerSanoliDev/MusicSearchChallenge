@@ -13,7 +13,9 @@ struct SongListView: View {
     private let sectionTitle: String?
     private let isPlaylist: Bool
     private let showsPaginationLoader: Bool
+    private let showsLeadingSwipeAction: Bool
     private let onSongSelected: (Int) -> Void
+    private let onLeadingSwipeAction: ((Song) -> Void)?
     private let onMoreOptionsSelected: ((Song) -> Void)?
     private let onReachedBottom: (() -> Void)?
     
@@ -23,6 +25,7 @@ struct SongListView: View {
         isPlaylist: Bool = false,
         showsPaginationLoader: Bool = true,
         onSongSelected: @escaping (Int) -> Void = { _ in },
+        onLeadingSwipeAction: ((Song) -> Void)? = nil,
         onMoreOptionsSelected: ((Song) -> Void)? = nil,
         onReachedBottom: (() -> Void)? = nil
     ) {
@@ -30,50 +33,80 @@ struct SongListView: View {
         self.sectionTitle = sectionTitle
         self.isPlaylist = isPlaylist
         self.showsPaginationLoader = showsPaginationLoader
+        self.showsLeadingSwipeAction = onLeadingSwipeAction != nil
         self.onSongSelected = onSongSelected
+        self.onLeadingSwipeAction = onLeadingSwipeAction
         self.onMoreOptionsSelected = onMoreOptionsSelected
         self.onReachedBottom = onReachedBottom
     }
     
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 0) {
-                if let sectionTitle {
-                    Text(sectionTitle)
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 16)
-                        .padding(.top, 12)
-                        .padding(.bottom, 4)
-                }
+        List {
+            if let sectionTitle {
+                sectionHeader(title: sectionTitle)
+                    .listRowInsets(EdgeInsets())
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+            }
 
-                ForEach(Array(songs.enumerated()), id: \.element.trackID) { index, song in
-                    SongCell(
-                        song: song,
-                        showsMoreOptionsButton: !isPlaylist,
-                        onMoreOptionsTap: {
-                            onMoreOptionsSelected?(song)
-                        }
-                    )
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        onSongSelected(index)
+            songRows
+            
+            if showsPaginationLoader && !isPlaylist {
+                SongCellLoadingView()
+                    .onAppear {
+                        onReachedBottom?()
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                }
-
-                if showsPaginationLoader && !isPlaylist {
-                    SongCellLoadingView()
-                        .onAppear {
-                            onReachedBottom?()
-                        }
-                }
+                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
             }
         }
+        .listStyle(.plain)
         .scrollIndicators(.hidden)
+        .scrollContentBackground(.hidden)
+        .contentMargins(.top, 0, for: .scrollContent)
         .preferredColorScheme(.dark)
+    }
+
+    @ViewBuilder
+    private var songRows: some View {
+        ForEach(Array(songs.enumerated()), id: \.element.trackID) { index, song in
+            SongCell(
+                song: song,
+                showsMoreOptionsButton: !isPlaylist,
+                onMoreOptionsTap: {
+                    onMoreOptionsSelected?(song)
+                }
+            )
+            .contentShape(Rectangle())
+            .onTapGesture {
+                onSongSelected(index)
+            }
+            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                if showsLeadingSwipeAction, let onLeadingSwipeAction {
+                    Button(role: .destructive) {
+                        onLeadingSwipeAction(song)
+                    } label: {
+                        Label("song_list.remove", systemImage: "trash")
+                    }
+                    .tint(.red)
+                }
+            }
+            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+            .listRowSeparator(.hidden)
+            .listRowBackground(Color.clear)
+        }
+    }
+
+    @ViewBuilder
+    private func sectionHeader(title: String) -> some View {
+        Text(title)
+            .font(.headline)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 4)
     }
 }
 

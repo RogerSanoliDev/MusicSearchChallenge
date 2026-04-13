@@ -14,6 +14,7 @@ protocol LocalStorageRepositoryProtocol: Sendable {
     func save(song: Song) async throws
     func save(songs: [Song]) async throws
     func saveRecentPlayed(song: Song) async throws
+    func removeRecentPlayed(song: Song) async throws
     func searchSongs(term: String, limit: Int, offset: Int) async throws -> [Song]
     func fetchRecentPlayed() async throws -> [Song]
 }
@@ -66,6 +67,12 @@ final class LocalStorageRepository: LocalStorageRepositoryProtocol {
         try modelContext.save()
     }
 
+    func removeRecentPlayed(song: Song) async throws {
+        guard let storedSong = try await fetchStoredSong(trackID: song.trackID) else { return }
+        storedSong.lastPlayedAt = nil
+        try modelContext.save()
+    }
+
     func searchSongs(term: String, limit: Int, offset: Int) async throws -> [Song] {
         let normalizedTerm = term.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !normalizedTerm.isEmpty, limit > 0, offset >= 0 else { return [] }
@@ -103,20 +110,23 @@ final class LocalStorageRepository: LocalStorageRepositoryProtocol {
         update: (StoredSong) -> Void,
         insert: () -> StoredSong
     )  async throws {
-        let trackID = song.trackID
-        let existingSong = try modelContext.fetch(
-            FetchDescriptor<StoredSong>(
-                predicate: #Predicate { storedSong in
-                    storedSong.trackID == trackID
-                }
-            )
-        ).first
+        let existingSong = try await fetchStoredSong(trackID: song.trackID)
 
         if let existingSong {
             update(existingSong)
         } else {
             modelContext.insert(insert())
         }
+    }
+
+    private func fetchStoredSong(trackID: Int) async throws -> StoredSong? {
+        try modelContext.fetch(
+            FetchDescriptor<StoredSong>(
+                predicate: #Predicate { storedSong in
+                    storedSong.trackID == trackID
+                }
+            )
+        ).first
     }
 
     private func fetchAllStoredSongs() async throws -> [StoredSong] {

@@ -11,6 +11,7 @@ protocol SearchServiceProtocol: Sendable {
     func search(term: String, limit: Int, offset: Int) async throws -> [Song]
     func fetchAlbum(collectionId: Int) async throws -> [Song]
     func saveRecentPlayed(song: Song) async throws
+    func removeRecentPlayed(song: Song) async throws
     func fetchRecentPlayed() async throws -> [Song]
 }
 
@@ -77,6 +78,10 @@ final class SearchService: SearchServiceProtocol {
     
     func saveRecentPlayed(song: Song) async throws {
         try await localStorageRepository.saveRecentPlayed(song: song)
+    }
+
+    func removeRecentPlayed(song: Song) async throws {
+        try await localStorageRepository.removeRecentPlayed(song: song)
     }
     
     func fetchRecentPlayed() async throws -> [Song] {

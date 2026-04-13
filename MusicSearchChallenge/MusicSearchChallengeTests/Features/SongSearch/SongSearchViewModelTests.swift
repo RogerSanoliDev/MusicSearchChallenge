@@ -252,6 +252,37 @@ struct SongSearchViewModelTests {
     }
 
     @Test
+    func removeRecentPlayed_removesSongFromVisibleRecents_andUpdatesState() async throws {
+        let mock = SearchServiceMock()
+        let firstSong = Song.stub(trackID: 1, artistName: "Artist", trackName: "First")
+        let secondSong = Song.stub(trackID: 2, artistName: "Artist", trackName: "Second")
+        let sut = SongSearchViewModel(searchService: mock)
+        sut.state = .recentPlayed
+        sut.recentPlayedSongs = [firstSong, secondSong]
+
+        await sut.removeRecentPlayed(firstSong)
+
+        #expect(await mock.removeRecentPlayedCalls == [.init(song: firstSong)])
+        #expect(sut.recentPlayedSongs == [secondSong])
+        #expect(sut.state == .recentPlayed)
+    }
+
+    @Test
+    func removeRecentPlayed_whenRemovingLastSong_setsIdleState() async throws {
+        let mock = SearchServiceMock()
+        let song = Song.stub(trackID: 1, artistName: "Artist", trackName: "First")
+        let sut = SongSearchViewModel(searchService: mock)
+        sut.state = .recentPlayed
+        sut.recentPlayedSongs = [song]
+
+        await sut.removeRecentPlayed(song)
+
+        #expect(await mock.removeRecentPlayedCalls == [.init(song: song)])
+        #expect(sut.recentPlayedSongs.isEmpty)
+        #expect(sut.state == .idle)
+    }
+
+    @Test
     func loadNextPageIfNeeded_appendsSongsAndUpdatesOffset() async throws {
         let mock = SearchServiceMock()
         await mock.setFetchRecentPlayedHandler { [] }
