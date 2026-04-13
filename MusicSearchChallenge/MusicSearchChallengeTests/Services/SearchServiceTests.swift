@@ -177,6 +177,18 @@ struct SearchServiceTests {
 
     @Test
     @MainActor
+    func removeRecentPlayed_callsLocalStorageRepositoryWithSong() async throws {
+        let localStorageRepository = LocalStorageRepositoryMock()
+        let sut = makeSUT(localStorageRepository: localStorageRepository)
+        let song = Song.stub(trackID: 123, trackName: "One More Time")
+
+        try await sut.removeRecentPlayed(song: song)
+
+        #expect(localStorageRepository.removedRecentPlayedSongs == [song])
+    }
+
+    @Test
+    @MainActor
     func fetchRecentPlayed_returnsSongsFromLocalStorageRepository() async throws {
         let localStorageRepository = LocalStorageRepositoryMock()
         let sut = makeSUT(localStorageRepository: localStorageRepository)

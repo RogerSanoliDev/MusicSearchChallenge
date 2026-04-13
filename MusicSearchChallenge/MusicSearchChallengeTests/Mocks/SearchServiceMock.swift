@@ -24,9 +24,14 @@ actor SearchServiceMock: SearchServiceProtocol {
         let song: Song
     }
 
+    struct RemoveRecentPlayedCall: Equatable {
+        let song: Song
+    }
+
     var searchCalls: [SearchCall] = []
     var fetchAlbumCalls: [FetchAlbumCall] = []
     var saveRecentPlayedCalls: [SaveRecentPlayedCall] = []
+    var removeRecentPlayedCalls: [RemoveRecentPlayedCall] = []
     var fetchRecentPlayedCallCount = 0
     var queuedFetchRecentPlayedResults: [[Song]] = []
     var searchHandler: (@Sendable (String, Int, Int) async throws -> [Song])?
@@ -81,6 +86,10 @@ actor SearchServiceMock: SearchServiceProtocol {
 
     func saveRecentPlayed(song: Song) async throws {
         saveRecentPlayedCalls.append(SaveRecentPlayedCall(song: song))
+    }
+
+    func removeRecentPlayed(song: Song) async throws {
+        removeRecentPlayedCalls.append(RemoveRecentPlayedCall(song: song))
     }
 
     func fetchRecentPlayed() async throws -> [Song] {

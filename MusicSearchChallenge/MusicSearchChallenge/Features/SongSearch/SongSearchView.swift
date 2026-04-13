@@ -60,6 +60,11 @@ struct SongSearchView: View {
                     guard let song = viewModel.currentSong(at: index) else { return }
                     onSongSelected(song)
                 },
+                onLeadingSwipeAction: { song in
+                    Task {
+                        await viewModel.removeRecentPlayed(song)
+                    }
+                },
                 onMoreOptionsSelected: onMoreOptionsSelected
             )
         case .loading:

@@ -184,6 +184,19 @@ final class SongSearchViewModel {
         return availableSongs[index]
     }
 
+    func removeRecentPlayed(_ song: Song) async {
+        do {
+            try await searchService.removeRecentPlayed(song: song)
+            recentPlayedSongs.removeAll { $0.trackID == song.trackID }
+
+            if trimmedSearchText.isEmpty {
+                applyInitialState()
+            }
+        } catch {
+            return
+        }
+    }
+
     private func loadRecentPlayed() async {
         do {
             let recentPlayedSongs = try await searchService.fetchRecentPlayed()
